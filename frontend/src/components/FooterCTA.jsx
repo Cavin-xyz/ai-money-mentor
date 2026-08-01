@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ArrowRight, Zap, FileCheck, HeartPulse, X } from 'lucide-react'
 import PrivacyPolicy from './PrivacyPolicy'
@@ -122,37 +123,40 @@ export default function FooterCTA() {
         </p>
       </div>
 
-      {/* Privacy Policy Modal */}
-      <AnimatePresence>
-        {isPrivacyOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-navy-950/70 backdrop-blur-md overflow-y-auto"
-            onClick={() => setIsPrivacyOpen(false)}
-          >
+      {/* Privacy Policy Modal Portaled to Document Body */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isPrivacyOpen && (
             <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-4xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-y-auto border border-navy-900/10 p-6 sm:p-10 my-auto text-navy-900"
-              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-navy-950/75 backdrop-blur-md overflow-y-auto"
+              onClick={() => setIsPrivacyOpen(false)}
             >
-              <button
-                onClick={() => setIsPrivacyOpen(false)}
-                className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2.5 rounded-full text-navy-900/50 hover:text-navy-900 hover:bg-navy-900/5 transition-all z-20"
-                aria-label="Close Privacy Policy"
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="relative w-full max-w-4xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-y-auto border border-navy-900/10 p-6 sm:p-10 my-auto text-navy-900 z-[100000]"
+                onClick={(e) => e.stopPropagation()}
               >
-                <X size={22} />
-              </button>
+                <button
+                  onClick={() => setIsPrivacyOpen(false)}
+                  className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2.5 rounded-full text-navy-900/50 hover:text-navy-900 hover:bg-navy-900/10 transition-all z-20"
+                  aria-label="Close Privacy Policy"
+                >
+                  <X size={22} />
+                </button>
 
-              <PrivacyPolicy />
+                <PrivacyPolicy />
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </footer>
   )
 }
