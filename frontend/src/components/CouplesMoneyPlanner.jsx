@@ -14,15 +14,21 @@ const defaultPartner = (name) => ({
   investments: '',
 })
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 async function fetchCoupleInsights(prompt) {
-  const response = await fetch('http://localhost:8080/api/couples-planner/insights', {
+  const response = await fetch(`${API_URL}/api/couples-planner/insights`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt }),
   })
   const text = await response.text()
   const cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim()
-  return JSON.parse(cleaned)
+  const parsed = JSON.parse(cleaned)
+  if (!response.ok || parsed.error) {
+    throw new Error(parsed.error || `HTTP error! Status: ${response.status}`)
+  }
+  return parsed
 }
 
 function ImpactBadge({ type, label }) {
@@ -83,7 +89,7 @@ Generate exactly 3 cross-income optimization insights as a JSON array.`
       }
     } catch (err) {
       console.error('Couple planner API error:', err)
-      setError('AI analysis failed. Please try again.')
+      setError(err.message || 'AI analysis failed. Please try again.')
     } finally {
       setLoading(false)
     }

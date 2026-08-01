@@ -64,8 +64,10 @@ const LIFE_EVENTS = [
 
 
 /* ─── Backend API ─────────────────────────────────────────────────────────── */
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 async function fetchAdvisory(prompt) {
-  const response = await fetch('http://localhost:8080/api/life-event/advise', {
+  const response = await fetch(`${API_URL}/api/life-event/advise`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt }),
@@ -73,7 +75,11 @@ async function fetchAdvisory(prompt) {
   const text = await response.text()
   // Strip markdown code fences if present
   const cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim()
-  return JSON.parse(cleaned)
+  const parsed = JSON.parse(cleaned)
+  if (!response.ok || parsed.error) {
+    throw new Error(parsed.error || `HTTP error! Status: ${response.status}`)
+  }
+  return parsed
 }
 
 /* No fallback data — all results come from AI */
@@ -119,7 +125,7 @@ export default function LifeEventAdvisor() {
       setCheckedItems({})
     } catch (err) {
       console.error('Advisory API error:', err)
-      setError('AI analysis failed. Please check that the backend is running and try again.')
+      setError(err.message || 'AI analysis failed. Please check that the backend is running and try again.')
     } finally {
       setLoading(false)
     }

@@ -33,15 +33,21 @@ function ScoreBar({ value, color }) {
 
 const inputClass = "w-full bg-navy-900/[0.03] border border-navy-900/10 rounded-xl px-4 py-3 text-navy-900 focus:outline-none focus:border-navy-900/30 focus:ring-1 focus:ring-navy-900/15 transition-all font-mono placeholder-navy-900/25 text-sm"
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 async function fetchHealthAnalysis(prompt) {
-  const response = await fetch('http://localhost:8080/api/health-score/analyze', {
+  const response = await fetch(`${API_URL}/api/health-score/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt }),
   })
   const text = await response.text()
   const cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim()
-  return JSON.parse(cleaned)
+  const parsed = JSON.parse(cleaned)
+  if (!response.ok || parsed.error) {
+    throw new Error(parsed.error || `HTTP error! Status: ${response.status}`)
+  }
+  return parsed
 }
 
 export default function MoneyHealthScore() {
@@ -228,7 +234,7 @@ Please analyze this data and provide scores across 6 dimensions with personalize
       setStep('results')
     } catch (err) {
       console.error('Health score API error:', err)
-      setError('AI analysis failed. Please try again.')
+      setError(err.message || 'AI analysis failed. Please try again.')
       setStep('form')
     }
   }

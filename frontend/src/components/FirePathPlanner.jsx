@@ -7,14 +7,18 @@ import {
 
 const inputClass = "w-full bg-navy-900/[0.03] border border-navy-900/10 rounded-xl px-4 py-3 text-navy-900 font-bold text-sm focus:outline-none focus:border-navy-900/30 focus:ring-1 focus:ring-navy-900/15 transition-all placeholder-navy-900/25 font-mono"
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 async function fetchFirePlan(profile) {
-  const response = await fetch('http://localhost:8080/api/fire/planner', {
+  const response = await fetch(`${API_URL}/api/fire/planner`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(profile),
   })
   const data = await response.json()
-  if (data.error) throw new Error(data.error)
+  if (!response.ok || data.error) {
+    throw new Error(data.error || `HTTP error! Status: ${response.status}`)
+  }
   // AI returns JSON string — parse it
   const text = data.response || ''
   const cleaned = text.replace(/```json\s*/gi, '').replace(/```/g, '').trim()
@@ -150,7 +154,7 @@ export default function FirePathPlanner() {
       setStep('results')
     } catch (err) {
       console.error('FIRE error:', err)
-      setError('AI analysis failed. Please try again.')
+      setError(err.message || 'AI analysis failed. Please try again.')
       setStep('form')
     }
   }

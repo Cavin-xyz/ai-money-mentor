@@ -7,17 +7,21 @@ import {
 } from 'lucide-react'
 
 /* ── API helper ── */
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+
 async function fetchPortfolioAnalysis(prompt, inlineData) {
   const body = { prompt }
   if (inlineData) body.inlineData = inlineData
 
-  const response = await fetch('http://localhost:8080/api/portfolio/analyze', {
+  const response = await fetch(`${API_URL}/api/portfolio/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
   const data = await response.json()
-  if (data.error) throw new Error(data.error)
+  if (!response.ok || data.error) {
+    throw new Error(data.error || `HTTP error! Status: ${response.status}`)
+  }
   const text = data.response || ''
   const cleaned = text.replace(/```json\s*/gi, '').replace(/```/g, '').trim()
   return JSON.parse(cleaned)
@@ -108,7 +112,7 @@ export default function PortfolioXRay() {
       setStep('results')
     } catch (err) {
       console.error('Portfolio X-Ray error:', err)
-      setError('AI analysis failed. Please try again.')
+      setError(err.message || 'AI analysis failed. Please try again.')
       setStep('upload')
     }
   }

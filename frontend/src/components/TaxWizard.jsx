@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, FileText, Edit3, User, Sparkles, UploadCloud, Image as ImageIcon } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
 export default function TaxWizard() {
   const [messages, setMessages] = useState([
@@ -31,22 +32,22 @@ export default function TaxWizard() {
 
     const newMsg = messageObject || { role: 'user', text: inputValue }
     const newMessages = [...messages, newMsg]
-    
+
     setMessages(newMessages)
     setInputValue('')
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:8080/api/tax/wizard', {
+      const response = await fetch(`${API_URL}/api/tax/wizard`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ history: newMessages })
       })
-      
+
       const data = await response.json()
-      
+
       if (response.ok && data.response) {
         setMessages([...newMessages, { role: 'assistant', text: data.response }])
       } else {
@@ -58,8 +59,8 @@ export default function TaxWizard() {
         }
       }
     } catch (error) {
-       console.error(error)
-       setMessages([...newMessages, { role: 'assistant', text: "Oops, I couldn't reach the backend server. Make sure your Spring Boot app is running on port 8080." }])
+      console.error(error)
+      setMessages([...newMessages, { role: 'assistant', text: "Oops, I couldn't reach the backend server. Make sure your Spring Boot app is running on port 8080." }])
     } finally {
       setIsLoading(false)
     }
@@ -143,7 +144,7 @@ export default function TaxWizard() {
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth bg-cream/50">
             <AnimatePresence>
               {messages.map((msg, idx) => (
-                <motion.div 
+                <motion.div
                   key={idx}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -152,20 +153,19 @@ export default function TaxWizard() {
                   <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center mt-1 border ${msg.role === 'user' ? 'bg-navy-900/[0.06] border-navy-900/10' : 'bg-navy-900/[0.06] border-navy-900/10'}`}>
                     {msg.role === 'user' ? <User size={14} className="text-navy-900/60" /> : <Sparkles size={14} className="text-navy-900/60" />}
                   </div>
-                  <div className={`p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                    msg.role === 'user' 
-                      ? 'bg-navy-900 text-white rounded-tr-none' 
+                  <div className={`p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user'
+                      ? 'bg-navy-900 text-white rounded-tr-none'
                       : 'bg-white text-navy-900/80 border border-navy-900/[0.08] rounded-tl-none prose prose-sm max-w-none'
-                  }`}>
+                    }`}>
                     {msg.role === 'user' ? (
                       <div>
                         {msg.text}
                         {msg.inlineData && (
                           <div className="mt-3 flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg border border-white/30 text-xs w-fit">
                             {msg.inlineData.mimeType.startsWith('image/') ? (
-                               <img src={`data:${msg.inlineData.mimeType};base64,${msg.inlineData.data}`} alt="upload" className="w-12 h-12 object-cover rounded shadow-sm" />
+                              <img src={`data:${msg.inlineData.mimeType};base64,${msg.inlineData.data}`} alt="upload" className="w-12 h-12 object-cover rounded shadow-sm" />
                             ) : (
-                               <FileText size={14} />
+                              <FileText size={14} />
                             )}
                             <span className="truncate max-w-[200px] font-medium">{msg.fileName || 'Document'}</span>
                           </div>
@@ -177,9 +177,9 @@ export default function TaxWizard() {
                   </div>
                 </motion.div>
               ))}
-              
+
               {isLoading && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex gap-3 max-w-[85%]"
@@ -210,13 +210,13 @@ export default function TaxWizard() {
                 </button>
               </div>
             )}
-            
-            <input 
-              type="file" 
-              accept="application/pdf,image/*" 
-              className="hidden" 
-              ref={fileInputRef} 
-              onChange={handleFileUpload} 
+
+            <input
+              type="file"
+              accept="application/pdf,image/*"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
             />
 
             <div className="relative flex items-end">
@@ -228,7 +228,7 @@ export default function TaxWizard() {
                 className="w-full bg-navy-900/[0.03] border border-navy-900/10 rounded-xl px-4 py-3 pr-12 text-sm text-navy-900 placeholder-navy-900/30 focus:outline-none focus:border-navy-900/30 focus:ring-1 focus:ring-navy-900/20 resize-none max-h-32 min-h-[50px] transition-all"
                 rows={inputValue.split('\n').length > 1 ? Math.min(6, inputValue.split('\n').length) : 1}
               />
-              <button 
+              <button
                 onClick={() => handleSend()}
                 disabled={!inputValue.trim() || isLoading}
                 className="absolute right-2 bottom-2 p-2 rounded-lg bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-50 disabled:hover:bg-navy-900 transition-colors"
