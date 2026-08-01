@@ -16,8 +16,12 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:3000", // local dev
-                                "https://ai-money-mentor-frontend.onrender.com" // replace with your real Render
-                                                                                // frontend URL
+                                "https://ai-money-mentor-frontend.onrender.com",
+                                "http://localhost:5173",
+                                "http://localhost:5174",
+                                "https://money-mentor.dev",
+                                "https://www.money-mentor.dev" // replace with your real Render
+                                                               // frontend URL
                 )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*");
