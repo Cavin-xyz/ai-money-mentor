@@ -6,7 +6,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/fire")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class FirePlannerController {
 
     private final FirePlannerService firePlannerService;

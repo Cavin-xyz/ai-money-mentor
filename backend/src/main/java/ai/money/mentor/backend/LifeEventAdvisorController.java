@@ -6,7 +6,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/life-event")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class LifeEventAdvisorController {
 
     private final LifeEventAdvisorService advisorService;

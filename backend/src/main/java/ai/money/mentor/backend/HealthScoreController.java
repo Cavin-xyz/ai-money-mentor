@@ -6,7 +6,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/health-score")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class HealthScoreController {
 
     private final HealthScoreService healthScoreService;

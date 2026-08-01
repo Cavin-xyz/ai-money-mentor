@@ -8,7 +8,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tax")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class TaxWizardController {
 
     private final TaxWizardService taxWizardService;
@@ -18,10 +17,12 @@ public class TaxWizardController {
     }
 
     @PostMapping("/wizard")
-    public ResponseEntity<Map<String, String>> getTaxAdvice(@RequestBody Map<String, List<Map<String, Object>>> chatRequest) {
-        // Expected payload: { "history": [ { "role": "user", "text": "Hi", "inlineData": {...} } ] }
+    public ResponseEntity<Map<String, String>> getTaxAdvice(
+            @RequestBody Map<String, List<Map<String, Object>>> chatRequest) {
+        // Expected payload: { "history": [ { "role": "user", "text": "Hi",
+        // "inlineData": {...} } ] }
         List<Map<String, Object>> history = chatRequest.get("history");
-        
+
         if (history == null || history.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Chat history is required"));
         }
@@ -31,7 +32,8 @@ public class TaxWizardController {
             return ResponseEntity.ok(Map.of("response", aiResponse));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", "Failed to generate AI response: " + e.getMessage()));
+            return ResponseEntity.status(500)
+                    .body(Map.of("error", "Failed to generate AI response: " + e.getMessage()));
         }
     }
 }
