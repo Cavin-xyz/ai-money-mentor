@@ -1,10 +1,30 @@
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { ArrowRight, Zap, FileCheck, HeartPulse } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { ArrowRight, Zap, FileCheck, HeartPulse, X } from 'lucide-react'
+import PrivacyPolicy from './PrivacyPolicy'
 
 export default function FooterCTA() {
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false)
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsPrivacyOpen(false)
+      }
+    }
+    if (isPrivacyOpen) {
+      document.body.style.overflow = 'hidden'
+      window.addEventListener('keydown', handleKeyDown)
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isPrivacyOpen])
 
   return (
     <footer className="relative pt-24 pb-12 overflow-hidden">
@@ -75,7 +95,17 @@ export default function FooterCTA() {
 
           <div className="flex flex-wrap gap-6 justify-center">
             {['Privacy Policy', 'Terms of Service', 'SEBI Disclosure', 'Contact', 'Blog'].map(link => (
-              <a key={link} href="#" className="text-xs text-navy-900/35 hover:text-navy-900/60 transition-colors">
+              <a
+                key={link}
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  if (link === 'Privacy Policy') {
+                    setIsPrivacyOpen(true)
+                  }
+                }}
+                className="text-xs text-navy-900/35 hover:text-navy-900/60 transition-colors cursor-pointer"
+              >
                 {link}
               </a>
             ))}
@@ -91,6 +121,38 @@ export default function FooterCTA() {
           investment advisor before making investment decisions.
         </p>
       </div>
+
+      {/* Privacy Policy Modal */}
+      <AnimatePresence>
+        {isPrivacyOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-navy-950/70 backdrop-blur-md overflow-y-auto"
+            onClick={() => setIsPrivacyOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-4xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-y-auto border border-navy-900/10 p-6 sm:p-10 my-auto text-navy-900"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setIsPrivacyOpen(false)}
+                className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2.5 rounded-full text-navy-900/50 hover:text-navy-900 hover:bg-navy-900/5 transition-all z-20"
+                aria-label="Close Privacy Policy"
+              >
+                <X size={22} />
+              </button>
+
+              <PrivacyPolicy />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </footer>
   )
 }
