@@ -15,13 +15,12 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "http://localhost:3000", // local dev
+                                "http://localhost:3000", 
                                 "https://ai-money-mentor-frontend.onrender.com",
                                 "http://localhost:5173",
                                 "http://localhost:5174",
                                 "https://money-mentor.dev",
-                                "https://www.money-mentor.dev" // replace with your real Render
-                                                               // frontend URL
+                                "https://www.money-mentor.dev" 
                 )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*");
