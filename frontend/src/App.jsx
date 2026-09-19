@@ -6,7 +6,6 @@ import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
 import ProfileBanner from './components/ProfileBanner'
 import FeatureBentoGrid from './components/FeatureBentoGrid'
-import ArchitectureSection from './components/ArchitectureSection'
 import FirePathPlanner from './components/FirePathPlanner'
 import MoneyHealthScore from './components/MoneyHealthScore'
 import TaxWizard from './components/TaxWizard'
@@ -28,7 +27,6 @@ function App() {
           <HeroSection />
           <ProfileBanner />
           <FeatureBentoGrid />
-          <ArchitectureSection />
           <FirePathPlanner />
           <MoneyHealthScore />
           <TaxWizard />

@@ -8,7 +8,6 @@ import { useProfile } from '../context/ProfileContext'
 import { useLanguage } from '../context/LanguageContext'
 
 const navLinks = [
-  { key: 'nav.howItWorks', href: '#architecture' },
   { key: 'nav.fire', href: '#fire' },
   { key: 'nav.health', href: '#health' },
   { key: 'nav.tax', href: '#tax' },
