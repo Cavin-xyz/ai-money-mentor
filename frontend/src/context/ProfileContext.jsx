@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { deleteJson, getJson, getProfileId, postJson, putJson, setProfileId } from '../lib/api'
+import { deleteJson, getJson, getMe, getProfileId, postJson, putJson, registerAccount, setProfileId, signIn as apiSignIn, signOut as apiSignOut } from '../lib/api'
 
 const EMPTY = { profile: null, prefs: { language: 'en', investmentStyle: 'balanced', notifications: false }, goals: [], history: [] }
+const NO_ACCOUNT = { ready: false, authenticated: false, username: null, required: false }
 
 const ProfileContext = createContext(null)
 
@@ -11,6 +12,7 @@ const ProfileContext = createContext(null)
  */
 export function ProfileProvider({ children }) {
   const [data, setData] = useState(EMPTY)
+  const [auth, setAuth] = useState(NO_ACCOUNT)
   const [drawer, setDrawer] = useState({ open: false, tab: 'profile' })
   const [restoreRequest, setRestoreRequest] = useState(null)
 
@@ -28,14 +30,59 @@ export function ProfileProvider({ children }) {
     }
   }, [])
 
+  /**
+   * On load, ask the backend who we are. A session cookie decides the profile id; without one
+   * the browser's own guest id is used, which is what keeps the app usable with no account.
+   */
   useEffect(() => {
     let cancelled = false
-    const id = getProfileId()
-    if (!id) return undefined
-    getJson(`/api/profile/${id}`)
-      .then((d) => { if (!cancelled) setData(d) })
-      .catch(() => { if (!cancelled) setProfileId(null) })
+    const bootstrap = async () => {
+      let me = { authenticated: false, authRequired: false }
+      try {
+        me = await getMe()
+      } catch {
+        /* backend not up yet — stay in guest mode */
+      }
+      if (cancelled) return
+      setAuth({ ready: true, authenticated: !!me.authenticated, username: me.username ?? null, required: !!me.authRequired })
+      if (me.authenticated) setProfileId(me.profileId)
+      const id = me.authenticated ? me.profileId : getProfileId()
+      if (!id) return
+      try {
+        const d = await getJson(`/api/profile/${id}`)
+        if (!cancelled) setData(d)
+      } catch {
+        if (!cancelled && !me.authenticated) setProfileId(null)
+      }
+    }
+    bootstrap()
     return () => { cancelled = true }
+  }, [])
+
+  /** Signing up carries the guest profile over, so nothing entered before the account is lost. */
+  const createAccount = useCallback(async (username, passphrase) => {
+    const me = await registerAccount({ username, passphrase })
+    setProfileId(me.profileId)
+    setAuth({ ready: true, authenticated: true, username: me.username, required: !!me.authRequired })
+    setData(await getJson(`/api/profile/${me.profileId}`))
+  }, [])
+
+  const login = useCallback(async (username, passphrase) => {
+    const me = await apiSignIn({ username, passphrase })
+    setProfileId(me.profileId)
+    setAuth({ ready: true, authenticated: true, username: me.username, required: !!me.authRequired })
+    setData(await getJson(`/api/profile/${me.profileId}`))
+  }, [])
+
+  /** Clears the local id too, so the next person on this laptop starts empty. */
+  const logout = useCallback(async () => {
+    try {
+      await apiSignOut()
+    } finally {
+      setProfileId(null)
+      setData(EMPTY)
+      setAuth((a) => ({ ...a, authenticated: false, username: null }))
+    }
   }, [])
 
   const create = useCallback(async (fields) => {
@@ -79,6 +126,7 @@ export function ProfileProvider({ children }) {
     if (id) await deleteJson(`/api/profile/${id}`)
     setProfileId(null)
     setData(EMPTY)
+    setAuth((a) => ({ ...a, authenticated: false, username: null }))
   }, [])
 
   /** Re-open a past run: the module listening for this name restores the saved result. */
@@ -93,6 +141,10 @@ export function ProfileProvider({ children }) {
   const value = useMemo(() => ({
     ...data,
     hasProfile: !!data.profile,
+    auth,
+    createAccount,
+    login,
+    logout,
     drawer,
     openDrawer: (tab = 'profile') => setDrawer({ open: true, tab }),
     closeDrawer: () => setDrawer((d) => ({ ...d, open: false })),
@@ -106,7 +158,7 @@ export function ProfileProvider({ children }) {
     deleteEverything,
     reopen,
     restoreRequest,
-  }), [data, drawer, load, create, update, updatePrefs, addGoal, deleteGoal, deleteEverything, reopen, restoreRequest])
+  }), [data, auth, createAccount, login, logout, drawer, load, create, update, updatePrefs, addGoal, deleteGoal, deleteEverything, reopen, restoreRequest])
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>
 }

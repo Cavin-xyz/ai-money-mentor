@@ -10,6 +10,7 @@ import { useLanguage } from '../context/LanguageContext'
 const navLinks = [
   { key: 'nav.fire', href: '#fire' },
   { key: 'nav.health', href: '#health' },
+  { key: 'nav.schemes', href: '#schemes' },
   { key: 'nav.tax', href: '#tax' },
   { key: 'nav.lifeEvents', href: '#advisor' },
   { key: 'nav.couples', href: '#couples' },
@@ -18,12 +19,14 @@ const navLinks = [
 ]
 
 function ProfileButton({ full = false }) {
-  const { hasProfile, profile, openDrawer } = useProfile()
+  const { hasProfile, profile, openDrawer, auth } = useProfile()
   const { t } = useLanguage()
   if (!hasProfile) {
+    // Where an account is compulsory, the button says so instead of offering to save a profile.
+    const label = auth?.required && !auth.authenticated ? 'nav.signIn' : 'nav.saveProfile'
     return (
       <button onClick={() => openDrawer('profile')} className={`btn-ghost !px-3 !py-1.5 text-xs flex items-center gap-1.5 whitespace-nowrap ${full ? 'w-full justify-center' : ''}`}>
-        <UserRound size={13} /> {t('nav.saveProfile')}
+        <UserRound size={13} /> {t(label)}
       </button>
     )
   }

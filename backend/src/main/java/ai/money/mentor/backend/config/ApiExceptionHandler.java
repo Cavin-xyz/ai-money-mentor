@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import ai.money.mentor.backend.auth.AuthService.AuthException;
 import ai.money.mentor.backend.llm.LlmUnavailableException;
 
 /** One error shape for every endpoint: {"error": "..."} — never a raw stack or exception message. */
@@ -24,9 +25,21 @@ public class ApiExceptionHandler {
                 .body(Map.of("error", "The local AI model is starting up or not running. Try again in a few seconds."));
     }
 
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<Map<String, String>> auth(AuthException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> badRequest(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
+
+    /** Keeps deliberate status codes (403 for someone else's profile) out of the catch-all below. */
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> status(org.springframework.web.server.ResponseStatusException e) {
+        String reason = e.getReason() == null ? "Request refused" : e.getReason();
+        return ResponseEntity.status(e.getStatusCode()).body(Map.of("error", reason));
     }
 
     @ExceptionHandler(Exception.class)

@@ -61,3 +61,28 @@ CREATE VIRTUAL TABLE IF NOT EXISTS chunk_fts USING fts5(
     doc_hash UNINDEXED,
     tokenize = 'porter unicode61'
 );
+
+-- ── Accounts and sessions ───────────────────────────────────────────
+-- One account owns exactly one profile. Passphrases are stored only as a PBKDF2 hash,
+-- session tokens only as a SHA-256 hash, so the database never holds a usable secret.
+
+CREATE TABLE IF NOT EXISTS user_account (
+    id TEXT PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    profile_id TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    last_login_at TEXT,
+    failed_attempts INTEGER NOT NULL DEFAULT 0,
+    locked_until TEXT
+);
+
+CREATE TABLE IF NOT EXISTS auth_session (
+    token_hash TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    last_seen_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_session_account ON auth_session(account_id);

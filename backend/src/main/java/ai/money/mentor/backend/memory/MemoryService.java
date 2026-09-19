@@ -36,7 +36,7 @@ public class MemoryService {
             Map.entry("retirementCorpus", "retirementCorpus"), Map.entry("equityPct", "equityPct"),
             Map.entry("city", "city"), Map.entry("riskTolerance", "riskTolerance"), Map.entry("name", "name"));
 
-    private static final Set<String> MODULE_LABELS = Set.of("fire", "health-score", "tax", "life-event", "couples-planner", "portfolio", "scam-shield", "ask");
+    private static final Set<String> MODULE_LABELS = Set.of("fire", "health-score", "tax", "life-event", "couples-planner", "portfolio", "scam-shield", "schemes", "ask");
 
     private final JdbcClient jdbc;
     private final JsonMapper json;
@@ -203,6 +203,8 @@ public class MemoryService {
         jdbc.sql("DELETE FROM interaction WHERE profile_id = ?").param(id).update();
         jdbc.sql("DELETE FROM financial_goal WHERE profile_id = ?").param(id).update();
         jdbc.sql("DELETE FROM user_pref WHERE profile_id = ?").param(id).update();
+        jdbc.sql("DELETE FROM auth_session WHERE account_id IN (SELECT id FROM user_account WHERE profile_id = ?)").param(id).update();
+        jdbc.sql("DELETE FROM user_account WHERE profile_id = ?").param(id).update();
         jdbc.sql("DELETE FROM user_profile WHERE id = ?").param(id).update();
     }
 

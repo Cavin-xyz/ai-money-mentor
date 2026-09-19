@@ -23,7 +23,10 @@ public class CorsConfig {
                                 "https://www.money-mentor.dev" 
                 )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                        .allowedHeaders("*");
+                        .allowedHeaders("*")
+                        // The session cookie only travels if credentials are allowed; every origin
+                        // above is listed explicitly, which CORS requires when this is on.
+                        .allowCredentials(true);
             }
         };
     }

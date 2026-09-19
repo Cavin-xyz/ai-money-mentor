@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, UserRound, Target, History, Settings2, ShieldCheck, Trash2, Plus, RotateCcw, Flame, Activity, Calculator, Lightbulb, Users, ScanLine, MessageCircleQuestion, ShieldAlert, Check } from 'lucide-react'
+import { X, UserRound, Target, History, Settings2, ShieldCheck, Trash2, Plus, RotateCcw, Flame, Activity, Calculator, Lightbulb, Users, ScanLine, MessageCircleQuestion, ShieldAlert, Check, LogOut } from 'lucide-react'
 import { useProfile } from '../context/ProfileContext'
 import { useLanguage } from '../context/LanguageContext'
 import { formatINRCompact, timeAgo } from '../lib/format'
+import AuthPanel from './AuthPanel'
 import { LANGUAGES } from '../i18n/strings'
 
 // Labels: drawer.tab.<key> and drawer.module.<module>
@@ -101,6 +102,9 @@ export default function ProfileDrawer() {
   const [goal, setGoal] = useState({ name: '', amount: '', years: '' })
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleted, setDeleted] = useState(false)
+  const [guestMode, setGuestMode] = useState(false)
+  // Signing in is offered first; "continue without an account" falls back to the local-only profile.
+  const showAuth = p.auth.ready && !p.auth.authenticated && (p.auth.required || !guestMode)
 
   useEffect(() => {
     if (!drawer.open) return undefined
@@ -166,7 +170,18 @@ export default function ProfileDrawer() {
               <div className="mx-5 mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">{t('drawer.deleted')}</div>
             )}
 
-            {!p.hasProfile ? (
+            {p.auth.authenticated && (
+              <div className="flex items-center justify-between gap-3 px-5 py-2.5 border-b border-navy-900/[0.06] bg-navy-900/[0.02]">
+                <span className="text-[11px] text-navy-900/55 truncate">{t('auth.signedInAs', { name: p.auth.username })}</span>
+                <button onClick={() => p.logout()} className="flex items-center gap-1 text-[11px] font-semibold text-navy-900/60 hover:text-navy-900">
+                  <LogOut size={12} /> {t('auth.signOut')}
+                </button>
+              </div>
+            )}
+
+            {showAuth ? (
+              <div className="flex-1 overflow-y-auto"><AuthPanel onGuest={() => setGuestMode(true)} /></div>
+            ) : !p.hasProfile ? (
               <div className="flex-1 overflow-y-auto p-5 space-y-4">
                 <p className="text-sm text-navy-900/60">{t('drawer.intro')}</p>
                 <ProfileForm profile={null} onSave={p.create} cta={t('drawer.createCta')} />

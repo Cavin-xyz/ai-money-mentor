@@ -55,6 +55,14 @@ const SERVER_ERRORS = {
   'Something went wrong while preparing your guidance. Please try again.': 'err.generic',
   'Something went wrong. Please try again.': 'err.generic',
   'Paste a message, or enter a UPI ID or app name': 'scam.errEmpty',
+  'That username is taken': 'auth.err.taken',
+  'Wrong username or passphrase': 'auth.err.wrong',
+  'Too many attempts. Try again in a few minutes.': 'auth.err.locked',
+  'Passphrase must be at least 10 characters': 'auth.err.short',
+  "Pick a passphrase that isn't based on your username or the app's name": 'auth.err.weak',
+  'Username: 3–32 characters, letters, digits, dot, dash or underscore': 'auth.err.username',
+  'Please sign in to continue.': 'auth.err.signInRequired',
+  'That profile belongs to another account': 'auth.err.forbidden',
   'Monthly income and expenses are required': 'err.incomeRequired',
   'Please enter salary for both partners': 'couples.errSalary',
 }
@@ -93,7 +101,27 @@ async function request(path, init) {
 }
 
 export function getJson(path) {
-  return request(path, { headers: headers() })
+  return request(path, { headers: headers(), credentials: 'include' })
+}
+
+// ── accounts ──────────────────────────────────────────────────────
+// The session token lives in an HttpOnly cookie, so there is nothing for these to store:
+// `credentials: 'include'` is what carries it (and lets a separate UI origin work too).
+
+export function getMe() {
+  return getJson('/api/auth/me')
+}
+
+export function registerAccount(body) {
+  return postJson('/api/auth/register', body)
+}
+
+export function signIn(body) {
+  return postJson('/api/auth/login', body)
+}
+
+export function signOut() {
+  return postJson('/api/auth/logout', {})
 }
 
 export function postJson(path, body) {
@@ -101,6 +129,7 @@ export function postJson(path, body) {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(body ?? {}),
+    credentials: 'include',
   })
 }
 
@@ -109,15 +138,16 @@ export function putJson(path, body) {
     method: 'PUT',
     headers: headers({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(body ?? {}),
+    credentials: 'include',
   })
 }
 
 export function deleteJson(path) {
-  return request(path, { method: 'DELETE', headers: headers() })
+  return request(path, { method: 'DELETE', headers: headers(), credentials: 'include' })
 }
 
 export function postForm(path, formData) {
-  return request(path, { method: 'POST', headers: headers(), body: formData })
+  return request(path, { method: 'POST', headers: headers(), body: formData, credentials: 'include' })
 }
 
 /**
@@ -133,6 +163,7 @@ export async function streamSse(path, body, handlers = {}, { signal } = {}) {
       method: 'POST',
       headers: headers(isForm ? { Accept: 'text/event-stream' } : { 'Content-Type': 'application/json', Accept: 'text/event-stream' }),
       body: isForm ? body : JSON.stringify(body ?? {}),
+      credentials: 'include',
       signal,
     })
   } catch (err) {

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { ScanLine, Calculator, Users, LayoutGrid, ArrowRight, Flame, Lightbulb, Activity, ShieldAlert } from 'lucide-react'
+import { ScanLine, Calculator, Users, LayoutGrid, ArrowRight, Flame, Lightbulb, Activity, ShieldAlert, Landmark } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 
 const scrollTo = (href) => {
@@ -24,6 +24,7 @@ const miniFeatures = [
   { id: 'life', icon: Lightbulb, href: '#advisor' },
   { id: 'health', icon: Activity, href: '#health' },
   { id: 'scam', icon: ShieldAlert, href: '#scam' },
+  { id: 'schemes', icon: Landmark, href: '#schemes' },
 ]
 
 const cardVariants = {

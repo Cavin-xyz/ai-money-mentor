@@ -25,6 +25,7 @@ public class RulesRepository {
 
     private final Map<String, TaxRules> taxRules = new LinkedHashMap<>();
     private final JsonNode limits;
+    private final JsonNode schemes;
     private final List<SectionMapping> sectionMap = new ArrayList<>();
     private final String defaultTaxYear;
 
@@ -38,6 +39,9 @@ public class RulesRepository {
         }
         try (InputStream in = new ClassPathResource("rules/limits.json").getInputStream()) {
             this.limits = jsonMapper.readTree(in);
+        }
+        try (InputStream in = new ClassPathResource("rules/schemes.json").getInputStream()) {
+            this.schemes = jsonMapper.readTree(in);
         }
         try (InputStream in = new ClassPathResource("rules/section-map.json").getInputStream()) {
             for (JsonNode m : jsonMapper.readTree(in).path("mappings")) {
@@ -102,6 +106,15 @@ public class RulesRepository {
 
     public JsonNode portfolioNode(String key) {
         return limits.path("portfolio").path(key);
+    }
+
+    /** Government schemes with their eligibility rules, from rules/schemes.json. */
+    public JsonNode schemes() {
+        return schemes.path("schemes");
+    }
+
+    public String schemesVerifiedOn() {
+        return schemes.path("verifiedOn").asString("");
     }
 
     public String limitsVerifiedOn() {

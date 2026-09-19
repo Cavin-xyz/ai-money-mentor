@@ -31,13 +31,14 @@ public class SystemStatusController {
     private final MemoryService memory;
     private final RulesRepository rules;
     private final AmfiService amfi;
+    private final ai.money.mentor.backend.auth.AuthService auth;
     private final String ollamaUrl;
     private final String chatModel;
     private final String embeddingModel;
     private final String qdrantCollection;
 
     public SystemStatusController(JsonMapper json, KnowledgeService knowledge, MemoryService memory, RulesRepository rules,
-            AmfiService amfi, @Value("${spring.ai.ollama.base-url}") String ollamaUrl,
+            AmfiService amfi, ai.money.mentor.backend.auth.AuthService auth, @Value("${spring.ai.ollama.base-url}") String ollamaUrl,
             @Value("${spring.ai.ollama.chat.model}") String chatModel,
             @Value("${spring.ai.ollama.embedding.model}") String embeddingModel,
             @Value("${spring.ai.vectorstore.qdrant.collection-name}") String qdrantCollection) {
@@ -46,6 +47,7 @@ public class SystemStatusController {
         this.memory = memory;
         this.rules = rules;
         this.amfi = amfi;
+        this.auth = auth;
         this.ollamaUrl = ollamaUrl;
         this.chatModel = chatModel;
         this.embeddingModel = embeddingModel;
@@ -87,6 +89,7 @@ public class SystemStatusController {
         try {
             db.put("up", true);
             db.put("profiles", memory.profileCount());
+            db.put("accounts", auth.accountCount());
         } catch (Exception e) {
             db.put("up", false);
         }

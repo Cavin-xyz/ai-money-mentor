@@ -8,6 +8,7 @@ import ProfileBanner from './components/ProfileBanner'
 import FeatureBentoGrid from './components/FeatureBentoGrid'
 import FirePathPlanner from './components/FirePathPlanner'
 import MoneyHealthScore from './components/MoneyHealthScore'
+import SchemesForYou from './components/SchemesForYou'
 import TaxWizard from './components/TaxWizard'
 import LifeEventAdvisor from './components/LifeEventAdvisor'
 import CouplesMoneyPlanner from './components/CouplesMoneyPlanner'
@@ -29,6 +30,7 @@ function App() {
           <FeatureBentoGrid />
           <FirePathPlanner />
           <MoneyHealthScore />
+          <SchemesForYou />
           <TaxWizard />
           <LifeEventAdvisor />
           <CouplesMoneyPlanner />
