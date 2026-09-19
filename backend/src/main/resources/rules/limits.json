@@ -1,0 +1,95 @@
+{
+  "verifiedOn": "2026-09-19",
+  "verificationStatus": "Rules marked confirmed:false must be checked by T2 (small-savings rates change quarterly).",
+  "assumptions": {
+    "inflationPct": { "value": 6, "note": "Long-run CPI assumption", "source": "https://mospi.gov.in" },
+    "equityReturnPct": { "value": 12, "note": "Long-run equity return assumption (not a guarantee)" },
+    "debtReturnPct": { "value": 7, "note": "Long-run debt return assumption" },
+    "hybridReturnPct": { "value": 9.5, "note": "Blend used for 3–7 year goals" },
+    "equityVolatilityPct": { "value": 18, "note": "Annual std-dev used in the scenario simulation" },
+    "debtVolatilityPct": { "value": 4, "note": "Annual std-dev used in the scenario simulation" },
+    "withdrawalRatePct": { "value": 3.5, "note": "Safe withdrawal rate; 3.5% is more conservative than the US 4% rule given higher Indian inflation" },
+    "educationInflationPct": { "value": 10, "note": "Education costs rise faster than CPI" },
+    "homeLoanRatePct": { "value": 8.5, "note": "Typical repo-linked home-loan rate — change to your lender's quote" },
+    "stampDutyPct": { "value": 6, "note": "Varies by state (≈5–7%) — check your state's rate" },
+    "registrationPct": { "value": 1, "note": "Varies by state" },
+    "childEducationCostToday": { "value": 2500000, "note": "Today's cost of a 4-year professional degree (assumption)" }
+  },
+  "planning": {
+    "emergencyMonths": 6,
+    "termCoverMultiple": 15,
+    "minTermCoverMultiple": 10,
+    "healthCoverTarget": 1000000,
+    "emiComfortPct": 40,
+    "foirMaxPct": 50,
+    "glidePath": [
+      { "minYearsLeft": 15, "equityPct": 80 },
+      { "minYearsLeft": 8, "equityPct": 70 },
+      { "minYearsLeft": 3, "equityPct": 50 },
+      { "minYearsLeft": 0, "equityPct": 30 }
+    ],
+    "sipBuckets": [
+      { "category": "Equity index funds", "sleeve": "equity", "sharePct": 55, "recommendation": "Nifty 50 / Sensex index fund, direct plan" },
+      { "category": "Flexi-cap / mid-cap funds", "sleeve": "equity", "sharePct": 35, "recommendation": "Diversified active or index flexi-cap, direct plan" },
+      { "category": "International / gold", "sleeve": "equity", "sharePct": 10, "recommendation": "Global index FoF or gold fund for diversification" },
+      { "category": "PPF / EPF / VPF", "sleeve": "debt", "sharePct": 60, "recommendation": "Government-backed, tax-efficient debt" },
+      { "category": "Short-duration debt funds", "sleeve": "debt", "sharePct": 40, "recommendation": "For goals and rebalancing liquidity" }
+    ],
+    "marriageBudgetSplit": [
+      { "item": "Venue & catering", "pct": 45 },
+      { "item": "Attire & jewellery", "pct": 25 },
+      { "item": "Photography & décor", "pct": 10 },
+      { "item": "Travel & other", "pct": 10 },
+      { "item": "Contingency buffer", "pct": 10 }
+    ]
+  },
+  "portfolio": {
+    "typicalTerNote": "Typical total expense ratios by category — T2 to replace with AMFI's TER snapshot",
+    "typicalTerPct": {
+      "Index": { "direct": 0.2, "regular": 0.6 },
+      "Large Cap": { "direct": 0.75, "regular": 1.75 },
+      "Large & Mid Cap": { "direct": 0.75, "regular": 1.75 },
+      "Flexi Cap": { "direct": 0.75, "regular": 1.75 },
+      "Multi Cap": { "direct": 0.75, "regular": 1.8 },
+      "Focused": { "direct": 0.8, "regular": 1.85 },
+      "Value/Contra": { "direct": 0.8, "regular": 1.85 },
+      "ELSS": { "direct": 0.75, "regular": 1.75 },
+      "Mid Cap": { "direct": 0.8, "regular": 1.85 },
+      "Small Cap": { "direct": 0.8, "regular": 1.9 },
+      "Sectoral/Thematic": { "direct": 0.9, "regular": 2.0 },
+      "International": { "direct": 0.5, "regular": 1.2 },
+      "Hybrid": { "direct": 0.75, "regular": 1.7 },
+      "Debt": { "direct": 0.35, "regular": 0.85 },
+      "Liquid": { "direct": 0.2, "regular": 0.4 },
+      "Arbitrage": { "direct": 0.35, "regular": 1.0 },
+      "Gold/Silver": { "direct": 0.3, "regular": 0.7 },
+      "Other": { "direct": 0.8, "regular": 1.6 }
+    },
+    "benchmark": {
+      "name": "Nifty 50 TRI",
+      "cagr5yPct": null,
+      "asOf": null,
+      "source": "https://www.niftyindices.com",
+      "confirmed": false
+    }
+  },
+  "rules": {
+    "ppfRatePct": { "value": 7.1, "authority": "Ministry of Finance (small savings)", "source": "https://dea.gov.in", "confirmed": false },
+    "ssyRatePct": { "value": 8.2, "authority": "Ministry of Finance (small savings)", "source": "https://dea.gov.in", "confirmed": false },
+    "epfRatePct": { "value": 8.25, "authority": "EPFO", "source": "https://www.epfindia.gov.in", "confirmed": false },
+    "ssyMaxDepositPerYear": { "value": 150000, "authority": "Ministry of Finance", "source": "https://dea.gov.in", "confirmed": false },
+    "ssyDepositYears": { "value": 15, "authority": "Ministry of Finance", "source": "https://dea.gov.in", "confirmed": false },
+    "ssyMaturityYears": { "value": 21, "authority": "Ministry of Finance", "source": "https://dea.gov.in", "confirmed": false },
+    "gratuityMinYears": { "value": 5, "authority": "Payment of Gratuity Act", "source": "https://labour.gov.in", "confirmed": false },
+    "homeLoanLtv": {
+      "authority": "Reserve Bank of India",
+      "source": "https://www.rbi.org.in",
+      "confirmed": false,
+      "tiers": [
+        { "upToPrice": 3000000, "maxLtvPct": 90 },
+        { "upToPrice": 7500000, "maxLtvPct": 80 },
+        { "upToPrice": null, "maxLtvPct": 75 }
+      ]
+    }
+  }
+}

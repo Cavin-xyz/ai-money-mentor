@@ -1,0 +1,45 @@
+# Knowledge base manifest — official Indian sources only.
+#
+# T1 (knowledge curator): save each document into knowledge/raw/ and add an entry below.
+#   file:       path under knowledge/  (PDF, HTML or Markdown)
+#   url:        the official page the file came from (shown on citation chips)
+#   title, authority: shown to users; authority = "Income Tax Department", "SEBI", "RBI", "AMFI", "IRDAI", "PFRDA", "Ministry of Finance"
+#   taxYear:    "2026-27" (Income-tax Act 2025), "2025-26" (1961 Act), or "all" (not year-specific)
+#   verifiedOn: date you checked the document is current (YYYY-MM-DD)
+#
+# incometaxindia.gov.in blocks automated downloads — open those pages in a browser and use
+# "Save page as… (HTML only)" into knowledge/raw/. Then run:  POST http://localhost:8080/api/admin/ingest
+# Unchanged files are skipped automatically, so re-running is cheap.
+
+documents:
+  - file: raw/it-new-vs-old-regime-faq.html
+    url: https://www.incometax.gov.in/iec/foportal/help/new-tax-vs-old-tax-regime-faqs
+    title: FAQs on New vs Old Tax Regime
+    authority: Income Tax Department
+    taxYear: all
+    docType: faq
+    verifiedOn: "2026-09-19"
+
+  - file: raw/it-salaried-ay2026-27.html
+    url: https://www.incometax.gov.in/iec/foportal/help/individual/return-applicable-1
+    title: Salaried Individuals for AY 2026-27
+    authority: Income Tax Department
+    taxYear: "2025-26"
+    docType: guide
+    verifiedOn: "2026-09-19"
+
+  - file: raw/sebi-regular-vs-direct.html
+    url: https://investor.sebi.gov.in/regular_and_direct_mutual_funds.html
+    title: Regular and Direct Mutual Fund Plans
+    authority: SEBI
+    taxYear: all
+    docType: investor-education
+    verifiedOn: "2026-09-19"
+
+  - file: raw/sebi-mf-investor-faqs.pdf
+    url: https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf
+    title: FAQs for Mutual Fund Investors
+    authority: SEBI
+    taxYear: all
+    docType: faq
+    verifiedOn: "2026-09-19"

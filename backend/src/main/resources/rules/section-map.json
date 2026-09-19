@@ -1,0 +1,26 @@
+{
+  "description": "Income-tax Act 1961 section -> Income-tax Act 2025 section. Used to rewrite search queries and to label answers 'Section 123 (formerly 80C)'.",
+  "verifiedOn": "2026-09-19",
+  "verificationStatus": "Seeded from a secondary mapping guide (taxgst.in) and ClearTax/TaxGuru coverage of Sections 123/156/202. T2 must confirm every row against the Income Tax Department's official old-to-new mapping before the demo.",
+  "mappings": [
+    { "old": "80C", "new": "123", "topic": "Deductions: PPF, EPF, ELSS, life insurance, home-loan principal", "confirmed": true },
+    { "old": "80CCC", "new": "123", "topic": "Pension fund contribution", "confirmed": false },
+    { "old": "80CCD", "new": "124", "topic": "NPS contribution", "confirmed": false },
+    { "old": "80CCD(1B)", "new": "124", "topic": "Additional own NPS contribution (₹50,000)", "confirmed": false },
+    { "old": "80CCD(2)", "new": "124", "topic": "Employer NPS contribution", "confirmed": false },
+    { "old": "80D", "new": "126", "topic": "Health insurance premium", "confirmed": false },
+    { "old": "80E", "new": "129", "topic": "Education loan interest", "confirmed": false },
+    { "old": "80G", "new": "133", "topic": "Donations", "confirmed": false },
+    { "old": "80TTA", "new": "153", "topic": "Savings account interest", "confirmed": false },
+    { "old": "80TTB", "new": "153", "topic": "Interest income for senior citizens", "confirmed": false },
+    { "old": "24(b)", "new": "22", "topic": "Home-loan interest", "confirmed": false },
+    { "old": "24", "new": "22", "topic": "Deductions from house property income", "confirmed": false },
+    { "old": "10(13A)", "new": "Schedule", "topic": "House Rent Allowance (HRA)", "confirmed": false },
+    { "old": "87A", "new": "156", "topic": "Rebate for resident individuals", "confirmed": true },
+    { "old": "115BAC", "new": "202", "topic": "New tax regime", "confirmed": true },
+    { "old": "111A", "new": "196", "topic": "Short-term capital gains on listed equity", "confirmed": false },
+    { "old": "112A", "new": "198", "topic": "Long-term capital gains on listed equity", "confirmed": false },
+    { "old": "192", "new": "392", "topic": "TDS on salary", "confirmed": false },
+    { "old": "Form 16", "new": "Form 130", "topic": "Salary TDS certificate", "confirmed": false }
+  ]
+}

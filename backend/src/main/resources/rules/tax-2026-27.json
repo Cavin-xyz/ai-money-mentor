@@ -1,0 +1,70 @@
+{
+  "taxYear": "2026-27",
+  "label": "Tax Year 2026-27",
+  "act": "Income-tax Act, 2025",
+  "incomePeriod": "1 Apr 2026 – 31 Mar 2027",
+  "verifiedOn": "2026-09-19",
+  "verificationStatus": "Slabs/rebate cross-checked against Budget 2025 + Budget 2026 (no change) reporting; T2 to confirm against incometaxindia.gov.in",
+  "newRegime": {
+    "name": "New regime",
+    "section": "202",
+    "formerSection": "115BAC",
+    "standardDeduction": 75000,
+    "slabs": [
+      { "upTo": 400000, "ratePct": 0 },
+      { "upTo": 800000, "ratePct": 5 },
+      { "upTo": 1200000, "ratePct": 10 },
+      { "upTo": 1600000, "ratePct": 15 },
+      { "upTo": 2000000, "ratePct": 20 },
+      { "upTo": 2400000, "ratePct": 25 },
+      { "upTo": null, "ratePct": 30 }
+    ],
+    "rebate": { "section": "156", "formerSection": "87A", "maxRebate": 60000, "incomeLimit": 1200000, "marginalRelief": true },
+    "surcharge": [
+      { "above": 5000000, "ratePct": 10 },
+      { "above": 10000000, "ratePct": 15 },
+      { "above": 20000000, "ratePct": 25 }
+    ],
+    "employerNpsPctOfBasic": 14,
+    "allowedDeductions": ["employerNps"],
+    "source": "https://incometaxindia.gov.in"
+  },
+  "oldRegime": {
+    "name": "Old regime",
+    "section": null,
+    "formerSection": null,
+    "standardDeduction": 50000,
+    "slabs": [
+      { "upTo": 250000, "ratePct": 0 },
+      { "upTo": 500000, "ratePct": 5 },
+      { "upTo": 1000000, "ratePct": 20 },
+      { "upTo": null, "ratePct": 30 }
+    ],
+    "rebate": { "section": "156", "formerSection": "87A", "maxRebate": 12500, "incomeLimit": 500000, "marginalRelief": false },
+    "surcharge": [
+      { "above": 5000000, "ratePct": 10 },
+      { "above": 10000000, "ratePct": 15 },
+      { "above": 20000000, "ratePct": 25 },
+      { "above": 50000000, "ratePct": 37 }
+    ],
+    "employerNpsPctOfBasic": 10,
+    "allowedDeductions": ["sec80C", "sec80D", "sec80DParents", "sec80CCD1B", "employerNps", "homeLoanInterest", "hra", "professionalTax"],
+    "source": "https://incometaxindia.gov.in"
+  },
+  "cessPct": 4,
+  "roundTaxToNearest": 10,
+  "deductions": {
+    "sec80C": { "label": "PPF, EPF, ELSS, life cover, home-loan principal", "section": "123", "formerSection": "80C", "limit": 150000 },
+    "sec80D": { "label": "Health insurance (self & family)", "section": "126", "formerSection": "80D", "limit": 25000, "seniorLimit": 50000 },
+    "sec80DParents": { "label": "Health insurance (parents)", "section": "126", "formerSection": "80D", "limit": 25000, "seniorLimit": 50000 },
+    "sec80CCD1B": { "label": "Own NPS contribution (extra)", "section": "124", "formerSection": "80CCD(1B)", "limit": 50000 },
+    "employerNps": { "label": "Employer NPS contribution", "section": "124", "formerSection": "80CCD(2)", "limit": null },
+    "homeLoanInterest": { "label": "Home-loan interest (self-occupied)", "section": "22", "formerSection": "24(b)", "limit": 200000 },
+    "hra": { "label": "House Rent Allowance exemption", "section": "Schedule", "formerSection": "10(13A)", "limit": null },
+    "professionalTax": { "label": "Professional tax", "section": null, "formerSection": "16(iii)", "limit": 2500 }
+  },
+  "sources": [
+    { "authority": "Income Tax Department", "title": "Income-tax Act, 2025 & Tax Year 2026-27 rates", "url": "https://incometaxindia.gov.in" },
+    { "authority": "Ministry of Finance", "title": "Union Budget 2026-27 (no change to slabs)", "url": "https://www.indiabudget.gov.in" }
+  ]
+}

@@ -2,13 +2,13 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, FileText, Edit3, User, Sparkles, UploadCloud, Image as ImageIcon } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+import { postJson } from '../lib/api'
 
 export default function TaxWizard() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: "Hi! I'm your ET Tax Wizard. Need help deciding between the Old and New tax regimes, or looking for missing deductions? How can I help you save some money today?"
+      text: "Hi! I'm your Tax Wizard, running entirely on this laptop. Need help choosing between the Old and New regimes, or finding deductions you're missing? Ask away, or upload your Form 16."
     }
   ])
   const [inputValue, setInputValue] = useState('')
@@ -38,29 +38,10 @@ export default function TaxWizard() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${API_URL}/api/tax/wizard`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ history: newMessages })
-      })
-
-      const data = await response.json()
-
-      if (response.ok && data.response) {
-        setMessages([...newMessages, { role: 'assistant', text: data.response }])
-      } else {
-        const errorMsg = data.error || "Hmm, I encountered an issue connecting to my brain. Make sure the backend is running and your API key is valid."
-        if (errorMsg.includes("429") || errorMsg.includes("quota")) {
-          setMessages([...newMessages, { role: 'assistant', text: "I've hit the Google Gemini API rate limit for the free tier! Please wait about 30 seconds before asking another question." }])
-        } else {
-          setMessages([...newMessages, { role: 'assistant', text: "Error: " + errorMsg }])
-        }
-      }
+      const data = await postJson('/api/tax/wizard', { history: newMessages })
+      setMessages([...newMessages, { role: 'assistant', text: data.response }])
     } catch (error) {
-      console.error(error)
-      setMessages([...newMessages, { role: 'assistant', text: "Oops, I couldn't reach the backend server. Make sure your Spring Boot app is running on port 8080." }])
+      setMessages([...newMessages, { role: 'assistant', text: error.message }])
     } finally {
       setIsLoading(false)
     }

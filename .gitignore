@@ -1,0 +1,6 @@
+# Local runtime — never commit
+/tools/
+/data/
+*.db
+*.log
+.qdrant-initialized

@@ -26,7 +26,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+        // Nirmala UI ships with Windows and covers Devanagari, Telugu and Tamil offline
+        sans: ['Plus Jakarta Sans', 'Inter', 'Nirmala UI', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace'],
       },
       backdropBlur: {
         xs: '2px',

@@ -8,6 +8,7 @@ import {
   ArrowRight, Download, CalendarSync, Check, Square, Shield,
   TrendingUp, Flame, HelpCircle, Archive, ChevronRight, Loader2
 } from 'lucide-react'
+import { postJson } from '../lib/api'
 
 /* ─── Life Events Config ─────────────────────────────────────────────────── */
 const LIFE_EVENTS = [
@@ -64,22 +65,8 @@ const LIFE_EVENTS = [
 
 
 /* ─── Backend API ─────────────────────────────────────────────────────────── */
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-
-async function fetchAdvisory(prompt) {
-  const response = await fetch(`${API_URL}/api/life-event/advise`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt }),
-  })
-  const text = await response.text()
-  // Strip markdown code fences if present
-  const cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim()
-  const parsed = JSON.parse(cleaned)
-  if (!response.ok || parsed.error) {
-    throw new Error(parsed.error || `HTTP error! Status: ${response.status}`)
-  }
-  return parsed
+function fetchAdvisory(prompt) {
+  return postJson('/api/life-event/advise', { prompt })
 }
 
 /* No fallback data — all results come from AI */

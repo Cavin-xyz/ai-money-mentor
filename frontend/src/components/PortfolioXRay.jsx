@@ -5,26 +5,13 @@ import {
   TrendingUp, PieChart, BarChart3, AlertTriangle, ArrowRightLeft,
   DollarSign, Heart, Zap, Layers, Target, ShieldCheck
 } from 'lucide-react'
+import { postJson } from '../lib/api'
 
 /* ── API helper ── */
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-
-async function fetchPortfolioAnalysis(prompt, inlineData) {
+function fetchPortfolioAnalysis(prompt, inlineData) {
   const body = { prompt }
   if (inlineData) body.inlineData = inlineData
-
-  const response = await fetch(`${API_URL}/api/portfolio/analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-  const data = await response.json()
-  if (!response.ok || data.error) {
-    throw new Error(data.error || `HTTP error! Status: ${response.status}`)
-  }
-  const text = data.response || ''
-  const cleaned = text.replace(/```json\s*/gi, '').replace(/```/g, '').trim()
-  return JSON.parse(cleaned)
+  return postJson('/api/portfolio/analyze', body)
 }
 
 /* ── Stagger helper ── */

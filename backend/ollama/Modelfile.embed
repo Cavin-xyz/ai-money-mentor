@@ -1,0 +1,4 @@
+# bge-m3 pinned to CPU so the 4 GB GPU stays free for the chat model.
+# Create with: ollama create bge-m3-cpu -f backend/ollama/Modelfile.embed
+FROM bge-m3
+PARAMETER num_gpu 0

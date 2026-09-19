@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Users, Sparkles, Loader2, RefreshCw
 } from 'lucide-react'
+import { postJson } from '../lib/api'
 
 const SLAB_OPTIONS = ['0', '5', '10', '15', '20', '25', '30']
 
@@ -14,21 +15,8 @@ const defaultPartner = (name) => ({
   investments: '',
 })
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-
-async function fetchCoupleInsights(prompt) {
-  const response = await fetch(`${API_URL}/api/couples-planner/insights`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt }),
-  })
-  const text = await response.text()
-  const cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim()
-  const parsed = JSON.parse(cleaned)
-  if (!response.ok || parsed.error) {
-    throw new Error(parsed.error || `HTTP error! Status: ${response.status}`)
-  }
-  return parsed
+function fetchCoupleInsights(prompt) {
+  return postJson('/api/couples-planner/insights', { prompt })
 }
 
 function ImpactBadge({ type, label }) {
