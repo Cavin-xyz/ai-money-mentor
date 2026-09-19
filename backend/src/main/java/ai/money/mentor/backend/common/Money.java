@@ -11,9 +11,12 @@ import java.util.regex.Pattern;
 /** Indian-style money formatting (lakh/crore) and parsing of ₹ amounts in free text. */
 public final class Money {
 
+    // Units in English, Hindi (लाख/करोड़), Telugu (లక్ష/కోటి) and Tamil (லட்சம்/கோடி) so the safety check
+    // reads translated explanations correctly.
     private static final Pattern RUPEE = Pattern.compile(
-            "(?:₹|Rs\\.?|INR)\\s?([0-9][0-9,]*(?:\\.[0-9]+)?)\\s?(crores?|cr|lakhs?|lacs?|l|k|thousand)?\\b",
-            Pattern.CASE_INSENSITIVE);
+            "(?:₹|Rs\\.?|INR)\\s?([0-9][0-9,]*(?:\\.[0-9]+)?)\\s?"
+                    + "(crores?|cr|lakhs?|lacs?|l|k|thousand|करोड़|करोड|लाख|कोटि|కోట్లు|కోటి|లక్షలు|లక్ష|கோடி|லட்சம்|லட்சங்கள்)?(?![A-Za-z])",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     private Money() {
     }
@@ -90,8 +93,8 @@ public final class Money {
             }
             String unit = m.group(2) == null ? "" : m.group(2).toLowerCase(Locale.ROOT);
             double mult = switch (unit) {
-                case "cr", "crore", "crores" -> 1e7;
-                case "l", "lakh", "lakhs", "lac", "lacs" -> 1e5;
+                case "cr", "crore", "crores", "करोड़", "करोड", "कोटि", "కోటి", "కోట్లు", "கோடி" -> 1e7;
+                case "l", "lakh", "lakhs", "lac", "lacs", "लाख", "లక్ష", "లక్షలు", "லட்சம்", "லட்சங்கள்" -> 1e5;
                 case "k", "thousand" -> 1e3;
                 default -> 1;
             };

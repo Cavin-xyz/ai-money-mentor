@@ -91,6 +91,8 @@ public class SafetyLayer {
 
         // 2. Calculation check — every ₹ figure must come from the engine, a rule or the user's input
         List<Double> allowed = allowedAmounts(trace, request, taxYear);
+        // Figures quoted from a retrieved official passage are grounded too
+        for (var c : citations) allowed.addAll(Money.amountsIn(c.snippet()));
         List<String> unverified = new ArrayList<>();
         int amounts = 0;
         for (String t : cleaned) {

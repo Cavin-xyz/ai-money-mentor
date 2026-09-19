@@ -27,6 +27,8 @@ public class KnowledgeService {
     // Measured with bge-m3: relevant passages score 0.59–0.71, off-topic ≤ 0.43
     private static final double MIN_SIMILARITY = 0.52;
     private static final int RRF_K = 60;
+    /** "Form 16", "Form No. 12BB" — exact identifiers where keyword search is reliable on its own. */
+    private static final java.util.regex.Pattern FORM_REF = java.util.regex.Pattern.compile("(?i)\\bform\\s*(no\\.?\\s*)?\\d+[a-z]*");
 
     private final VectorStore vectorStore;
     private final KeywordIndex keywords;
@@ -70,7 +72,7 @@ public class KnowledgeService {
         }
 
         var hits = keywords.search(expanded, taxYear, CANDIDATES);
-        boolean exactTerm = !sections.sectionsIn(query).isEmpty();
+        boolean exactTerm = !sections.sectionsIn(query).isEmpty() || FORM_REF.matcher(query).find();
         if (!vec.isEmpty() || exactTerm) { // keyword-only results are trusted only for exact section lookups
             for (int i = 0; i < hits.size(); i++) {
                 var h = hits.get(i);

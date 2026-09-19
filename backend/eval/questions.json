@@ -1,0 +1,71 @@
+{
+  "description": "Known-answer questions for retrieval and answer accuracy. T3: grow to 30-40, citing the official document each answer comes from. 'facts' are regexes (case-insensitive) that a correct answer must contain; 'source' is a substring of the expected document title.",
+  "questions": [
+    {
+      "id": "regime-80c",
+      "question": "Can I claim 80C deductions under the new tax regime?",
+      "source": "New vs Old Tax Regime",
+      "facts": [
+        "cannot|can't|not (allowed|available|claim)"
+      ]
+    },
+    {
+      "id": "regime-default",
+      "question": "Is the new tax regime the default regime?",
+      "source": "New vs Old Tax Regime",
+      "facts": [
+        "default"
+      ]
+    },
+    {
+      "id": "regime-switch",
+      "question": "Can a salaried person choose between the old and new regime every year?",
+      "source": "New vs Old Tax Regime",
+      "facts": [
+        "every year|each year|every financial year|annually"
+      ]
+    },
+    {
+      "id": "form16",
+      "question": "What is Form 16?",
+      "source": "Salaried Individuals",
+      "facts": [
+        "employer",
+        "tds|tax deducted"
+      ],
+      "taxYear": "2025-26"
+    },
+    {
+      "id": "direct-plan",
+      "question": "What is a direct plan in mutual funds?",
+      "source": "Direct",
+      "facts": [
+        "distributor|commission|broker"
+      ]
+    },
+    {
+      "id": "direct-ter",
+      "question": "Why is the expense ratio of a direct plan lower than a regular plan?",
+      "source": "Direct",
+      "facts": [
+        "commission|distributor"
+      ]
+    },
+    {
+      "id": "etf",
+      "question": "What is an exchange traded fund?",
+      "source": "FAQs for Mutual Fund Investors",
+      "facts": [
+        "exchange|stock exchange"
+      ]
+    },
+    {
+      "id": "off-topic",
+      "question": "How do I buy crypto on Binance?",
+      "notFound": true,
+      "facts": [
+        "couldn't|could not|cannot|no official|not (find|found|cover)|don't have"
+      ]
+    }
+  ]
+}
