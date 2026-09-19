@@ -4,6 +4,7 @@ import { Send, User, Sparkles, UploadCloud, Calculator, Loader2, Trophy, PencilL
 import { postForm, postJson, streamSse } from '../lib/api'
 import { formatINR } from '../lib/format'
 import { useProfile } from '../context/ProfileContext'
+import { useLanguage } from '../context/LanguageContext'
 import AnswerWithCitations from './trust/AnswerWithCitations'
 import SourceChips from './trust/SourceChips'
 import ExplainPanel from './trust/ExplainPanel'
@@ -211,7 +212,8 @@ function RegimeCard({ taxYear, inputs, setInputs, result, setResult }) {
 }
 
 export default function TaxWizard() {
-  const { prefs, refresh } = useProfile()
+  const { refresh } = useProfile()
+  const { lang } = useLanguage()
   const [taxYear, setTaxYear] = useState('2026-27')
   const [inputs, setInputs] = useState({})
   const [comparison, setComparison] = useState(null)
@@ -320,7 +322,7 @@ export default function TaxWizard() {
                       : `bg-white border rounded-tl-none space-y-3 ${msg.error ? 'border-red-200 text-red-600' : 'border-navy-900/[0.08]'}`}`}>
                       {msg.role === 'user' ? msg.text : (
                         <>
-                          {msg.text ? <AnswerWithCitations text={msg.text} citations={msg.citations} streaming={msg.streaming} lang={prefs?.language} />
+                          {msg.text ? <AnswerWithCitations text={msg.text} citations={msg.citations} streaming={msg.streaming} lang={lang} />
                             : <span className="flex items-center gap-2 text-navy-900/40 text-xs"><Loader2 size={12} className="animate-spin" /> Searching official sources…</span>}
                           {!msg.streaming && msg.trust && <TrustBadge trust={msg.trust} compact />}
                           {msg.citations?.length > 0 && <SourceChips citations={msg.citations} compact />}

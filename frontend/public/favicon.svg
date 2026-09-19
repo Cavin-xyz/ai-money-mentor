@@ -1,39 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
-  <rect width="800" height="500" rx="20" fill="#C7D2FE" opacity="0.4"/>
-  <!-- Money pile -->
-  <rect x="400" y="180" width="200" height="120" rx="8" fill="#22C55E" opacity="0.7"/>
-  <rect x="420" y="160" width="200" height="120" rx="8" fill="#16A34A" opacity="0.8"/>
-  <rect x="440" y="140" width="200" height="120" rx="8" fill="#15803D"/>
-  <!-- Dollar signs on bills -->
-  <text x="530" y="210" font-size="24" fill="#fff" font-weight="bold" text-anchor="middle" font-family="sans-serif">₹</text>
-  <!-- Gold coins -->
-  <circle cx="500" cy="340" r="35" fill="#FBBF24"/>
-  <circle cx="500" cy="340" r="28" fill="#F59E0B"/>
-  <text x="500" y="348" font-size="20" fill="#fff" font-weight="bold" text-anchor="middle" font-family="sans-serif">₹</text>
-  <circle cx="560" cy="360" r="25" fill="#FBBF24"/>
-  <circle cx="560" cy="360" r="20" fill="#F59E0B"/>
-  <circle cx="440" cy="370" r="20" fill="#FBBF24"/>
-  <circle cx="440" cy="370" r="16" fill="#F59E0B"/>
-  <!-- Wallet -->
-  <rect x="350" y="310" width="70" height="55" rx="8" fill="#3B82F6"/>
-  <rect x="355" y="320" width="40" height="30" rx="4" fill="#DBEAFE"/>
-  <!-- Family silhouettes -->
-  <!-- Father -->
-  <circle cx="280" cy="200" r="28" fill="#1E40AF"/>
-  <rect x="255" y="228" width="50" height="80" rx="10" fill="#1E40AF"/>
-  <!-- Mother -->
-  <circle cx="200" cy="210" r="26" fill="#DC2626"/>
-  <rect x="177" y="236" width="46" height="75" rx="10" fill="#DC2626"/>
-  <!-- Child -->
-  <circle cx="240" cy="270" r="18" fill="#F97316"/>
-  <rect x="225" y="288" width="30" height="50" rx="8" fill="#F97316"/>
-  <!-- Grandparent -->
-  <circle cx="130" cy="210" r="24" fill="#7C3AED"/>
-  <rect x="108" y="234" width="44" height="70" rx="10" fill="#7C3AED"/>
-  <!-- Small child -->
-  <circle cx="320" cy="280" r="16" fill="#EC4899"/>
-  <rect x="306" y="296" width="28" height="42" rx="8" fill="#EC4899"/>
-  <!-- Growth arrow -->
-  <path d="M 580 300 L 650 180 L 680 200" stroke="#15803D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <polygon points="650,165 660,195 640,195" fill="#15803D"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="16" fill="#0A192F"/>
+  <path d="M22 46V18h21v6H29v6h12v6H29v10z" fill="#F5F3EF"/>
+  <circle cx="45" cy="44" r="4" fill="#10B981"/>
 </svg>

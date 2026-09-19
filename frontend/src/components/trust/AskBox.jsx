@@ -5,11 +5,11 @@ import { streamSse } from '../../lib/api'
 import AnswerWithCitations from './AnswerWithCitations'
 import SourceChips from './SourceChips'
 import { TrustBadge } from './Badges'
-import { useProfile } from '../../context/ProfileContext'
+import { useLanguage } from '../../context/LanguageContext'
 
 /** "Ask about this" — a follow-up question answered from official sources, with this result as context. */
 export default function AskBox({ module, context, suggestions = [] }) {
-  const { prefs } = useProfile() || {}
+  const { lang } = useLanguage()
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
   const [answer, setAnswer] = useState('')
@@ -82,7 +82,7 @@ export default function AskBox({ module, context, suggestions = [] }) {
               </form>
               {(answer || busy) && (
                 <div className="p-4 rounded-xl bg-navy-900/[0.02] border border-navy-900/[0.06] space-y-3">
-                  {answer ? <AnswerWithCitations text={answer} citations={citations} streaming={busy} lang={prefs?.language} />
+                  {answer ? <AnswerWithCitations text={answer} citations={citations} streaming={busy} lang={lang} />
                     : <p className="text-xs text-navy-900/40 flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> Searching official sources…</p>}
                   {!busy && (
                     <div className="flex flex-wrap items-start gap-2">

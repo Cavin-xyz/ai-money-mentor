@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, UserRound, Target, History, Settings2, ShieldCheck, Trash2, Plus, RotateCcw, Flame, Activity, Calculator, Lightbulb, Users, ScanLine, MessageCircleQuestion, ShieldAlert, Check } from 'lucide-react'
 import { useProfile } from '../context/ProfileContext'
+import { useLanguage } from '../context/LanguageContext'
 import { formatINRCompact, timeAgo } from '../lib/format'
 
 const TABS = [
@@ -93,6 +94,7 @@ function ProfileForm({ profile, onSave, cta }) {
 export default function ProfileDrawer() {
   const p = useProfile()
   const { drawer, closeDrawer, setDrawerTab } = p
+  const { lang, setLang } = useLanguage()
   const panelRef = useRef(null)
   const [goal, setGoal] = useState({ name: '', amount: '', years: '' })
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -230,8 +232,8 @@ export default function ProfileDrawer() {
                         <p className="text-xs font-bold text-navy-900 mb-2">Explanation language</p>
                         <div className="grid grid-cols-2 gap-2" role="radiogroup">
                           {LANGUAGES.map(([code, name]) => (
-                            <button key={code} role="radio" aria-checked={p.prefs.language === code} onClick={() => p.updatePrefs({ language: code })}
-                              className={`px-3 py-2.5 rounded-xl border text-sm font-semibold ${p.prefs.language === code ? 'border-navy-900 bg-navy-900 text-white' : 'border-navy-900/10 bg-white text-navy-900/70'}`}>
+                            <button key={code} role="radio" aria-checked={lang === code} onClick={() => setLang(code)}
+                              className={`px-3 py-2.5 rounded-xl border text-sm font-semibold ${lang === code ? 'border-navy-900 bg-navy-900 text-white' : 'border-navy-900/10 bg-white text-navy-900/70'}`}>
                               {name}
                             </button>
                           ))}

@@ -11,6 +11,12 @@ public record UserContext(String profileId, Map<String, Object> profile, List<Ma
         return new UserContext(null, Map.of(), List.of(), "en", "balanced", false, List.of());
     }
 
+    /** The language picked in the UI (X-Language header) overrides the saved preference. */
+    public UserContext withLanguage(String lang) {
+        if (lang == null || !java.util.Set.of("en", "hi", "te", "ta").contains(lang)) return this;
+        return new UserContext(profileId, profile, goals, lang, investmentStyle, rememberNumbers, recentSummaries);
+    }
+
     public boolean hasProfile() {
         return profileId != null && profile != null && !profile.isEmpty();
     }

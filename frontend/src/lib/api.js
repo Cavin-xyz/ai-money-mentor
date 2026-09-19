@@ -21,10 +21,31 @@ export function setProfileId(id) {
   }
 }
 
+const LANG_KEY = 'finmind.lang'
+
+/** The language explicitly chosen on this device, or null. */
+export function getLanguage() {
+  try {
+    return localStorage.getItem(LANG_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function setLanguage(code) {
+  try {
+    localStorage.setItem(LANG_KEY, code)
+  } catch {
+    /* storage unavailable — the choice lasts for this session only */
+  }
+}
+
 function headers(extra = {}) {
   const h = { ...extra }
   const id = getProfileId()
   if (id) h['X-Profile-Id'] = id
+  const lang = getLanguage()
+  if (lang) h['X-Language'] = lang
   return h
 }
 

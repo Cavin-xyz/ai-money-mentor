@@ -89,7 +89,7 @@ export default function FooterCTA() {
               <Zap size={11} className="text-navy-900" />
             </div>
             <span className="font-bold text-sm text-navy-900">
-              Money<span className="text-navy-600">Mentor</span>
+              Fin<span className="text-navy-600/70">Mind</span>
             </span>
             <span className="text-navy-900/25 text-xs ml-2">runs on your device</span>
           </div>
@@ -112,12 +112,12 @@ export default function FooterCTA() {
             ))}
           </div>
 
-          <p className="text-xs text-navy-900/30">© 2026 Money Mentor</p>
+          <p className="text-xs text-navy-900/30">© 2026 FinMind</p>
         </motion.div>
 
         {/* Disclaimer */}
         <p className="mt-6 text-center text-[11px] text-navy-900/25 leading-relaxed max-w-3xl mx-auto">
-          Disclaimer: Money Mentor provides educational guidance generated on this device and is not investment, tax or
+          Disclaimer: FinMind provides educational guidance generated on this device and is not investment, tax or
           legal advice. Numbers come from a deterministic calculator and rules come from official sources, but all
           investments are subject to market risk. Consult a SEBI-registered investment adviser or a Chartered Accountant
           before acting.

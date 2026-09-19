@@ -1,5 +1,5 @@
 <#
-  Starts the whole Money Mentor stack on this laptop, fully offline-capable:
+  Starts the whole FinMind stack on this laptop, fully offline-capable:
     Qdrant (vector DB) -> Ollama (local LLM) -> Spring Boot (serves API + built UI) -> browser.
 
   Usage (from anywhere):

@@ -54,7 +54,8 @@ public class PortfolioController {
             @RequestParam(value = "password", required = false) String password,
             @RequestParam(value = "holdings", required = false) String holdingsJson,
             @RequestParam(value = "targetEquityPct", required = false) String targetEquityPct,
-            @RequestHeader(value = "X-Profile-Id", required = false) String profileId) throws IOException {
+            @RequestHeader(value = "X-Profile-Id", required = false) String profileId,
+            @RequestHeader(value = "X-Language", required = false) String language) throws IOException {
         Map<String, Object> req = new HashMap<>();
         if (targetEquityPct != null && !targetEquityPct.isBlank()) req.put("targetEquityPct", targetEquityPct);
         if (file != null && !file.isEmpty()) {
@@ -77,7 +78,7 @@ public class PortfolioController {
         } else {
             throw new IllegalArgumentException("Upload a statement or add your funds");
         }
-        return pipeline.stream("portfolio", req, profileId);
+        return pipeline.stream("portfolio", req, profileId, language);
     }
 
     /** Autocomplete for the manual row editor. */

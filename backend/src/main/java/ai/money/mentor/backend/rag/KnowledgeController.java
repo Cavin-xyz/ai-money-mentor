@@ -36,7 +36,8 @@ public class KnowledgeController {
 
     @PostMapping(path = "/api/knowledge/ask/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter ask(@RequestBody Map<String, Object> body,
-            @RequestHeader(value = "X-Profile-Id", required = false) String profileId) {
+            @RequestHeader(value = "X-Profile-Id", required = false) String profileId,
+            @RequestHeader(value = "X-Language", required = false) String language) {
         String question = Inputs.str(body, "question", "");
         if (question.isBlank()) throw new IllegalArgumentException("Please type a question");
         String module = Inputs.str(body, "module", "ask");
@@ -44,7 +45,7 @@ public class KnowledgeController {
         String taxYear = Inputs.str(body, "taxYear", rules.defaultTaxYear());
         String prompt = screen.isBlank() ? question : question + "\n\nCONTEXT FROM SCREEN (" + module + "):\n" + screen;
         return chat.stream(new ChatStreamer.ChatRequest("ask", ASK_BRIEF, List.of(), prompt, question, null, null, taxYear,
-                profileId, Map.of("context", screen), null));
+                profileId, Map.of("context", screen), null, language));
     }
 
     @GetMapping("/api/knowledge/sources")

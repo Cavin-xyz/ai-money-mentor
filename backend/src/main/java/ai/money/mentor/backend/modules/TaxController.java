@@ -76,7 +76,8 @@ public class TaxController {
 
     @PostMapping(path = "/api/tax/wizard/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter wizard(@RequestBody Map<String, Object> body,
-            @RequestHeader(value = "X-Profile-Id", required = false) String profileId) {
+            @RequestHeader(value = "X-Profile-Id", required = false) String profileId,
+            @RequestHeader(value = "X-Language", required = false) String language) {
         List<Map<String, Object>> history = Inputs.list(body, "history");
         if (history.isEmpty()) throw new IllegalArgumentException("Ask a question to get started");
         String taxYear = Inputs.str(body, "taxYear", rules.defaultTaxYear());
@@ -100,7 +101,7 @@ public class TaxController {
             payload = toPayload(c);
         }
         return chat.stream(new ChatStreamer.ChatRequest("tax", WIZARD_BRIEF, prior, question, question + " " + taxYear,
-                trace, winner, taxYear, profileId, inputs, payload));
+                trace, winner, taxYear, profileId, inputs, payload, language));
     }
 
     @PostMapping(path = "/api/documents/form16", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

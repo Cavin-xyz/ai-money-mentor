@@ -1,6 +1,6 @@
 @echo off
 rem ---------------------------------------------------------------------------
-rem  Money Mentor - start backend + frontend for development
+rem  FinMind - start backend + frontend for development
 rem
 rem    run.bat            start Qdrant, Ollama, backend (:8080) and frontend (:5173)
 rem    run.bat stop       stop backend and frontend
@@ -25,7 +25,7 @@ set "OLLAMA_KV_CACHE_TYPE=q8_0"
 if /i "%~1"=="stop" goto stop
 
 echo.
-echo   Money Mentor - starting everything on this laptop
+echo   FinMind - starting everything on this laptop
 echo   -------------------------------------------------
 if not exist "%DATA%" mkdir "%DATA%"
 

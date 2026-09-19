@@ -1,4 +1,4 @@
-# Money Mentor — private, on-device money guidance for India
+# FinMind — Stop Guessing. Start Growing.
 
 Every number is **calculated** by a Java engine, every rule is **cited** from official sources
 (Income Tax Department, SEBI, RBI, AMFI), and the explanation is written by a **local LLM** —

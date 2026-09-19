@@ -74,12 +74,16 @@ public class AdvisorPipeline {
     }
 
     public SseEmitter stream(String module, Map<String, Object> request, String profileId) {
+        return stream(module, request, profileId, null);
+    }
+
+    public SseEmitter stream(String module, Map<String, Object> request, String profileId, String language) {
         ModuleAdvisor advisor = advisor(module);
         var emitter = new SseEmitter(240_000L);
         var events = new PipelineEvents(emitter);
         executor.execute(() -> {
             try {
-                run(advisor, request, profileId, events);
+                run(advisor, request, profileId, language, events);
             } catch (IllegalArgumentException e) {
                 events.error(e.getMessage());
             } catch (Exception e) {
@@ -92,26 +96,26 @@ public class AdvisorPipeline {
         return emitter;
     }
 
-    public ObjectNode runSync(String module, Map<String, Object> request, String profileId) {
-        return run(advisor(module), request, profileId, PipelineEvents.none());
+    public ObjectNode runSync(String module, Map<String, Object> request, String profileId, String language) {
+        return run(advisor(module), request, profileId, language, PipelineEvents.none());
     }
 
     /** Engine only — instant, no retrieval, no LLM (used by what-if toggles). */
-    public ObjectNode calcOnly(String module, Map<String, Object> request, String profileId) {
-        var user = memory.context(profileId);
+    public ObjectNode calcOnly(String module, Map<String, Object> request, String profileId, String language) {
+        var user = memory.context(profileId).withLanguage(language);
         Prepared p = advisor(module).prepare(request, user);
         ObjectNode out = p.result();
         out.set("meta", meta(p, List.of(), null, "calculation-only", 0));
         return out;
     }
 
-    ObjectNode run(ModuleAdvisor advisor, Map<String, Object> request, String profileId, PipelineEvents ev) {
+    ObjectNode run(ModuleAdvisor advisor, Map<String, Object> request, String profileId, String language, PipelineEvents ev) {
         long t0 = System.currentTimeMillis();
 
         // 2. Memory
         long t = System.currentTimeMillis();
         ev.stage("memory", "start", 0, null);
-        UserContext user = memory.context(profileId);
+        UserContext user = memory.context(profileId).withLanguage(language);
         ev.stage("memory", "done", System.currentTimeMillis() - t, user.hasProfile() ? "Profile, goals & history loaded" : "No saved profile");
 
         // 3. Deterministic calculation

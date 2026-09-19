@@ -26,19 +26,22 @@ public class PipelineController {
 
     @PostMapping(path = "/{module}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter stream(@PathVariable String module, @RequestBody Map<String, Object> body,
-            @RequestHeader(value = "X-Profile-Id", required = false) String profileId) {
-        return pipeline.stream(module, body, profileId);
+            @RequestHeader(value = "X-Profile-Id", required = false) String profileId,
+            @RequestHeader(value = "X-Language", required = false) String language) {
+        return pipeline.stream(module, body, profileId, language);
     }
 
     @PostMapping("/{module}/calc")
     public ObjectNode calc(@PathVariable String module, @RequestBody Map<String, Object> body,
-            @RequestHeader(value = "X-Profile-Id", required = false) String profileId) {
-        return pipeline.calcOnly(module, body, profileId);
+            @RequestHeader(value = "X-Profile-Id", required = false) String profileId,
+            @RequestHeader(value = "X-Language", required = false) String language) {
+        return pipeline.calcOnly(module, body, profileId, language);
     }
 
     @PostMapping("/{module}/run")
     public ObjectNode run(@PathVariable String module, @RequestBody Map<String, Object> body,
-            @RequestHeader(value = "X-Profile-Id", required = false) String profileId) {
-        return pipeline.runSync(module, body, profileId);
+            @RequestHeader(value = "X-Profile-Id", required = false) String profileId,
+            @RequestHeader(value = "X-Language", required = false) String language) {
+        return pipeline.runSync(module, body, profileId, language);
     }
 }

@@ -1,5 +1,7 @@
 import './index.css'
+import { MotionConfig } from 'framer-motion'
 import { ProfileProvider } from './context/ProfileContext'
+import { LanguageProvider } from './context/LanguageContext'
 import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
 import ProfileBanner from './components/ProfileBanner'
@@ -18,6 +20,8 @@ import ProfileDrawer from './components/ProfileDrawer'
 function App() {
   return (
     <ProfileProvider>
+      <LanguageProvider>
+      <MotionConfig reducedMotion="user">
       <div className="min-h-screen overflow-x-hidden">
         <Navbar />
         <main>
@@ -36,6 +40,8 @@ function App() {
         <FooterCTA />
         <ProfileDrawer />
       </div>
+      </MotionConfig>
+      </LanguageProvider>
     </ProfileProvider>
   )
 }

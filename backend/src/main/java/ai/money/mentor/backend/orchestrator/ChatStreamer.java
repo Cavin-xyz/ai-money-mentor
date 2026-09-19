@@ -38,7 +38,7 @@ public class ChatStreamer {
 
     public record ChatRequest(String module, String instructions, List<Message> history, String question,
             String retrievalQuery, CalcTrace trace, String regimeWinner, String taxYear, String profileId,
-            Map<String, Object> rawRequest, Object calcPayload) {
+            Map<String, Object> rawRequest, Object calcPayload, String language) {
     }
 
     private final MemoryService memory;
@@ -82,7 +82,7 @@ public class ChatStreamer {
         long t0 = System.currentTimeMillis();
         long t = t0;
         ev.stage("memory", "start", 0, null);
-        UserContext user = memory.context(req.profileId());
+        UserContext user = memory.context(req.profileId()).withLanguage(req.language());
         ev.stage("memory", "done", System.currentTimeMillis() - t, user.hasProfile() ? "Profile loaded" : "No saved profile");
 
         CalcTrace trace = req.trace() != null ? req.trace() : new CalcTrace();
