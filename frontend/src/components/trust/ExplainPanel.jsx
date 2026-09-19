@@ -66,9 +66,9 @@ export default function ExplainPanel({ calculations = [], assumptions = [], defa
                               <a href={r.source} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline font-sans">
                                 {t('explain.rule')} <ExternalLink size={10} />
                               </a>
-                            ) : r.formula === 'rule' ? 'rule' : r.formula}
+                            ) : r.formula === 'rule' ? t('explain.rule') : p(r.formula)}
                           </td>
-                          <td className="py-1.5 text-right font-mono font-semibold text-navy-900 whitespace-nowrap">{r.value}</td>
+                          <td className="py-1.5 text-right font-mono font-semibold text-navy-900 whitespace-nowrap">{p(r.value)}</td>
                         </tr>
                       ))}
                     </tbody>

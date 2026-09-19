@@ -189,7 +189,7 @@ function RegimeCard({ taxYear, inputs, setInputs, result, setResult }) {
               <p className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40">{t('tax.card.gaps')}</p>
               {result.gaps.map((g) => (
                 <div key={g.key} className="flex items-center justify-between text-xs p-2 rounded-lg bg-navy-900/[0.02] border border-navy-900/[0.05]">
-                  <span className="text-navy-900/70">{g.section} <span className="text-navy-900/40">· {t('tax.card.unused', { amount: formatINR(g.headroom) })}</span></span>
+                  <span className="text-navy-900/70">{p(g.section)} <span className="text-navy-900/40">· {t('tax.card.unused', { amount: formatINR(g.headroom) })}</span></span>
                   <span className="font-semibold text-emerald-700">{t('tax.card.saves', { amount: formatINR(g.oldRegimeSaving) })}</span>
                 </div>
               ))}
