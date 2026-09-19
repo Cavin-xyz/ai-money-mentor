@@ -83,7 +83,7 @@ rem 5. Wait until both answer, then open the browser
 echo   [..] Waiting for the backend (first start can take a minute)
 set /a tries=0
 :waitbackend
-curl -s -o nul -m 2 http://localhost:8080/api/system/status && goto waitfrontend
+curl -s -o nul -m 2 http://localhost:8080/api/system/status && goto ingest
 set /a tries+=1
 if %tries% geq 120 (
   echo   [!] Backend is taking long - check the "Money Mentor - backend" window
@@ -91,6 +91,10 @@ if %tries% geq 120 (
 )
 timeout /t 2 /nobreak >nul
 goto waitbackend
+
+:ingest
+echo   [..] Checking local knowledge sources
+curl -s -X POST -o nul -m 10 http://localhost:8080/api/admin/ingest
 
 :waitfrontend
 set /a tries=0
