@@ -50,6 +50,8 @@ public class TaxController {
             MODULE: Tax Wizard (chat).
             Answer the user's latest question concisely with bullet points where helpful.
             If CALCULATIONS contains a regime comparison, use those exact figures for any Old vs New comparison.
+            The new regime is the default: if it is the better one, say no opt-out is needed. Only suggest opting out
+            of the new regime when CALCULATIONS shows the old regime is cheaper. Don't invent filing steps.
             If SOURCES don't cover the question, say you couldn't find it in the official documents loaded on this
             device and suggest incometaxindia.gov.in — do not guess.
             Mention a Chartered Accountant for complex cases (capital gains, business income, foreign assets).""";
