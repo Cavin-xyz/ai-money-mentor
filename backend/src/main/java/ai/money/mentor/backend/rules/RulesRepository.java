@@ -95,6 +95,11 @@ public class RulesRepository {
         return n.path("authority").asString("") + " · " + n.path("source").asString("");
     }
 
+    /** A top-level block of limits.json, e.g. "scam". */
+    public JsonNode block(String key) {
+        return limits.path(key);
+    }
+
     public JsonNode portfolioNode(String key) {
         return limits.path("portfolio").path(key);
     }

@@ -1,16 +1,37 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Zap } from 'lucide-react'
+import { Menu, X, Zap, UserRound } from 'lucide-react'
+import StatusPill from './StatusPill'
+import { useProfile } from '../context/ProfileContext'
 
 const navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'FIRE Planner', href: '#fire' },
-  { label: 'Tax Wizard', href: '#tax' },
-  { label: 'Health Score', href: '#health' },
-  { label: 'Life Advisor', href: '#advisor' },
-  { label: 'Couple Planner', href: '#couples' },
-  { label: 'Portfolio X-Ray', href: '#xray' },
+  { label: 'How it works', href: '#architecture' },
+  { label: 'FIRE', href: '#fire' },
+  { label: 'Health', href: '#health' },
+  { label: 'Tax', href: '#tax' },
+  { label: 'Life Events', href: '#advisor' },
+  { label: 'Couples', href: '#couples' },
+  { label: 'X-Ray', href: '#xray' },
+  { label: 'Scam Shield', href: '#scam' },
 ]
+
+function ProfileButton({ full = false }) {
+  const { hasProfile, profile, openDrawer } = useProfile()
+  if (!hasProfile) {
+    return (
+      <button onClick={() => openDrawer('profile')} className={`btn-ghost !px-3 !py-1.5 text-xs flex items-center gap-1.5 whitespace-nowrap ${full ? 'w-full justify-center' : ''}`}>
+        <UserRound size={13} /> Save profile
+      </button>
+    )
+  }
+  const initials = (profile.name || 'Me').split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+  return (
+    <button onClick={() => openDrawer('profile')} aria-label="Open your profile and memory" className={`flex items-center gap-2 ${full ? 'w-full justify-center py-2 rounded-xl border border-navy-900/10' : ''}`}>
+      <span className="w-8 h-8 rounded-full bg-navy-900 text-white text-xs font-bold flex items-center justify-center">{initials}</span>
+      {full && <span className="text-sm font-semibold text-navy-900">{profile.name}</span>}
+    </button>
+  )
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -69,12 +90,12 @@ export default function Navbar() {
             <Zap size={16} className="text-navy-900" />
           </div>
           <span className="font-bold text-navy-900 text-base tracking-tight hidden sm:inline">
-            AI<span className="text-navy-600">Money</span>Mentor
+            Money<span className="text-navy-600">Mentor</span>
           </span>
         </a>
 
         {/* Desktop Links (Centered) */}
-        <div className="hidden lg:flex items-center justify-center flex-1 mx-8 gap-1">
+        <div className="hidden lg:flex items-center justify-center flex-1 mx-4 gap-0.5">
           {navLinks.map(l => {
             const isActive = activeSection === l.href.slice(1)
             return (
@@ -101,8 +122,11 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Empty div for flexbox balancing to ensure absolute centering */}
-        <div className="hidden lg:block w-[180px]"></div>
+        {/* Right: local stack status + memory */}
+        <div className="hidden lg:flex items-center justify-end gap-2 w-[250px] flex-shrink-0">
+          <StatusPill />
+          <ProfileButton />
+        </div>
 
         {/* Mobile menu toggle */}
         <button
@@ -140,6 +164,10 @@ export default function Navbar() {
                   </a>
                 )
               })}
+              <div className="mt-3 pt-3 border-t border-navy-900/[0.06] flex flex-col gap-2">
+                <StatusPill full />
+                <ProfileButton full />
+              </div>
             </div>
           </motion.div>
         )}

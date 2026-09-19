@@ -1,10 +1,21 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip
 } from 'recharts'
-import { Activity, Sparkles, Loader2, ChevronRight, ChevronLeft } from 'lucide-react'
-import { postJson } from '../lib/api'
+import { Activity, Sparkles, ChevronRight, ChevronLeft, UserRound, Info } from 'lucide-react'
+import { useAdvisorStream } from '../hooks/useAdvisorStream'
+import { useProfile, profileValues } from '../context/ProfileContext'
+import PipelineProgress from './trust/PipelineProgress'
+import ResultFooter from './trust/ResultFooter'
+
+const PROFILE_MAP = {
+  monthlyIncome: 'monthlyIncome', monthlyExpenses: 'monthlyExpenses', liquidSavings: 'liquidSavings',
+  dependents: 'dependents', lifeCover: 'lifeCover', healthCover: 'healthCover', monthlyEmi: 'monthlyEmi',
+  equityPct: 'equityPct', currentAge: 'age', targetRetirementAge: 'retirementAge', retirementCorpus: 'retirementCorpus',
+}
+
+const LABEL_COLOR = { Excellent: 'text-emerald-600', Good: 'text-emerald-600', 'Needs Attention': 'text-amber-600', Critical: 'text-red-600' }
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload?.length) {
@@ -34,16 +45,14 @@ function ScoreBar({ value, color }) {
 
 const inputClass = "w-full bg-navy-900/[0.03] border border-navy-900/10 rounded-xl px-4 py-3 text-navy-900 focus:outline-none focus:border-navy-900/30 focus:ring-1 focus:ring-navy-900/15 transition-all font-mono placeholder-navy-900/25 text-sm"
 
-function fetchHealthAnalysis(prompt) {
-  return postJson('/api/health-score/analyze', { prompt })
-}
-
 export default function MoneyHealthScore() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
-  const [step, setStep] = useState('form') // form | loading | results
+  const { profile, hasProfile, restoreRequest, refresh } = useProfile()
+  const stream = useAdvisorStream('/api/health-score/stream')
   const [formPage, setFormPage] = useState(0)
+  const [openFormula, setOpenFormula] = useState(null)
   const [formData, setFormData] = useState({
     monthlyIncome: '',
     monthlyExpenses: '',
@@ -62,8 +71,20 @@ export default function MoneyHealthScore() {
     targetRetirementAge: '60',
     retirementCorpus: '',
   })
-  const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
+  const { restore, status } = stream
+  useEffect(() => {
+    if (restoreRequest?.module === 'health-score') {
+      restore(restoreRequest.result)
+      document.getElementById('health')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [restoreRequest, restore])
+  useEffect(() => {
+    if (status === 'done') refresh()
+  }, [status, refresh])
+  const results = stream.data
+  const showResults = stream.status !== 'idle'
+  const pending = stream.running && !stream.result
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -181,54 +202,18 @@ export default function MoneyHealthScore() {
     },
   ]
 
-  const handleAnalyze = async () => {
-    setStep('loading')
-    setError(null)
-
-    const prompt = `
-Analyze the following user's financial health data:
-
-INCOME & SAVINGS:
-- Monthly Take-Home Income: ₹${formData.monthlyIncome || '0'}
-- Monthly Expenses: ₹${formData.monthlyExpenses || '0'}
-- Liquid Savings (FDs, Savings, Liquid Funds): ₹${formData.liquidSavings || '0'}
-
-INSURANCE & DEBT:
-- Has Financial Dependents: ${formData.dependents}
-- Term Life Insurance Cover: ₹${formData.lifeCover || '0'}
-- Health Insurance Cover: ₹${formData.healthCover || '0'}
-- Total Monthly EMI (all loans): ₹${formData.monthlyEmi || '0'}
-
-INVESTMENTS:
-- Invests beyond FDs: ${formData.investOutsideFd}
-- Portfolio Split: ${formData.equityPct}% Equity / ${formData.debtPct}% Debt
-
-TAX EFFICIENCY:
-- Exhausted 80C limit (₹1.5L): ${formData.exhausted80C}
-- Claims 80D deduction: ${formData.claim80D}
-- Contributes to NPS (80CCD): ${formData.useNPS}
-
-RETIREMENT:
-- Current Age: ${formData.currentAge || 'Not provided'}
-- Target Retirement Age: ${formData.targetRetirementAge || '60'}
-- Current Retirement Corpus: ₹${formData.retirementCorpus || '0'}
-
-Please analyze this data and provide scores across 6 dimensions with personalized recommendations.`
-
-    try {
-      const data = await fetchHealthAnalysis(prompt)
-      if (data.error) throw new Error(data.error)
-      setResults(data)
-      setStep('results')
-    } catch (err) {
-      console.error('Health score API error:', err)
-      setError(err.message || 'AI analysis failed. Please try again.')
-      setStep('form')
+  const handleAnalyze = () => {
+    if (!formData.monthlyIncome || !formData.monthlyExpenses) {
+      setError('Please enter at least your monthly income and expenses.')
+      setFormPage(0)
+      return
     }
+    setError(null)
+    stream.run(formData)
   }
 
   return (
-    <section id="health" className="py-24 relative">
+    <section id="health" className="py-24 relative scroll-mt-20">
       <div className="absolute inset-0 grid-dot-bg opacity-20 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -248,13 +233,13 @@ Please analyze this data and provide scores across 6 dimensions with personalize
             Your Financial <span className="gradient-text">Vital Signs</span>
           </h2>
           <p className="mt-4 text-navy-900/50 max-w-xl mx-auto text-base leading-relaxed">
-            Our AI analyzes your financial data to give you a personalized score across 6 critical dimensions with actionable recommendations.
+            Six dimensions scored by visible formulas, not AI guesses. Tap any score to see exactly how it was computed.
           </p>
         </motion.div>
 
         <AnimatePresence mode="wait">
           {/* ── FORM STATE ── */}
-          {step === 'form' && (
+          {!showResults && (
             <motion.div
               key="form"
               initial={{ opacity: 0, y: 20 }}
@@ -263,6 +248,11 @@ Please analyze this data and provide scores across 6 dimensions with personalize
               className="max-w-2xl mx-auto"
             >
               <div className="glass-card p-6 sm:p-8">
+                {hasProfile && (
+                  <button onClick={() => setFormData((p) => ({ ...p, ...profileValues(profile, PROFILE_MAP) }))} className="mb-4 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-navy-900/[0.04] border border-navy-900/10 text-xs font-semibold text-navy-900/70 hover:bg-navy-900/[0.07]">
+                    <UserRound size={13} /> Use my saved numbers
+                  </button>
+                )}
                 {/* Progress */}
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-navy-900/45">
@@ -316,7 +306,7 @@ Please analyze this data and provide scores across 6 dimensions with personalize
                       className="btn-primary flex items-center gap-2 text-sm"
                     >
                       <Sparkles size={14} />
-                      Analyze with AI
+                      Score my finances
                     </button>
                   )}
                 </div>
@@ -328,31 +318,25 @@ Please analyze this data and provide scores across 6 dimensions with personalize
             </motion.div>
           )}
 
-          {/* ── LOADING STATE ── */}
-          {step === 'loading' && (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center py-20"
-            >
-              <div className="w-20 h-20 rounded-full bg-navy-900/[0.05] flex items-center justify-center mb-6">
-                <Loader2 size={36} className="text-navy-900/40 animate-spin" />
-              </div>
-              <p className="text-lg font-semibold text-navy-900 mb-2">AI is analyzing your finances…</p>
-              <p className="text-sm text-navy-900/40">Scoring 6 dimensions with personalized insights</p>
-            </motion.div>
-          )}
-
           {/* ── RESULTS STATE ── */}
-          {step === 'results' && results && (
+          {showResults && (
             <motion.div
               key="results"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
+              className="space-y-5"
             >
+              <div className="max-w-3xl mx-auto">
+                <PipelineProgress stages={stream.stages} status={stream.status} citations={stream.citations} trust={stream.result?.meta?.trust} />
+              </div>
+              {stream.status === 'error' && (
+                <div className="glass-card p-5 text-center max-w-3xl mx-auto">
+                  <p className="text-sm text-red-600">{stream.error}</p>
+                  <button onClick={() => stream.reset()} className="btn-ghost mt-3 text-xs">Back to the form</button>
+                </div>
+              )}
+              {results && (<>
               <div className="grid lg:grid-cols-3 gap-6 items-start">
                 {/* Col 1: Overall + dimensions */}
                 <motion.div
@@ -368,7 +352,7 @@ Please analyze this data and provide scores across 6 dimensions with personalize
                         <motion.circle
                           cx="50" cy="50" r="44"
                           fill="none"
-                          stroke="#0A192F"
+                          stroke={results.overallColor || '#0A192F'}
                           strokeWidth="8"
                           strokeLinecap="round"
                           strokeDasharray={`${2 * Math.PI * 44}`}
@@ -383,17 +367,24 @@ Please analyze this data and provide scores across 6 dimensions with personalize
                       </div>
                     </div>
                     <p className="text-sm font-semibold text-navy-900">Overall Score</p>
-                    <p className="text-xs text-amber-600 font-medium mt-0.5">{results.overallLabel || 'Needs Attention'}</p>
+                    <p className={`text-xs font-semibold mt-0.5 ${LABEL_COLOR[results.overallLabel] || 'text-navy-900/60'}`}>{results.overallLabel}</p>
+                    <p className="text-[10px] text-navy-900/35 mt-1">Weighted: {(results.dimensions || []).map((d) => `${d.dimension} ${d.weight}%`).join(' · ')}</p>
                   </div>
 
                   <div className="space-y-3">
                     {(results.dimensions || []).map(d => (
                       <div key={d.label} className="space-y-1.5">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-navy-900/55">{d.label}</span>
+                        <button onClick={() => setOpenFormula(openFormula === d.label ? null : d.label)} className="w-full flex justify-between items-center text-left" aria-expanded={openFormula === d.label}>
+                          <span className="text-xs text-navy-900/55 flex items-center gap-1">{d.label} <Info size={11} className="text-navy-900/30" /></span>
                           <span className="text-xs font-bold" style={{ color: d.color }}>{d.value}</span>
-                        </div>
+                        </button>
                         <ScoreBar value={d.value} color={d.color} />
+                        {openFormula === d.label && (
+                          <div className="text-[11px] p-2.5 rounded-lg bg-navy-900/[0.03] border border-navy-900/[0.06] space-y-0.5">
+                            <p className="font-mono text-navy-900/70">{d.formula}</p>
+                            <p className="text-navy-900/50">{d.desc}</p>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -441,7 +432,7 @@ Please analyze this data and provide scores across 6 dimensions with personalize
                 >
                   <div className="flex items-center gap-2">
                     <Sparkles size={14} className="text-navy-900/40" />
-                    <p className="text-sm font-semibold text-navy-900/70">AI Recommendations</p>
+                    <p className="text-sm font-semibold text-navy-900/70">Recommendations</p>
                   </div>
 
                   {(results.recommendations || []).map((item, i) => (
@@ -452,18 +443,29 @@ Please analyze this data and provide scores across 6 dimensions with personalize
                         </span>
                       </div>
                       <p className="text-sm font-semibold text-navy-900">{item.title}</p>
-                      <p className="text-xs text-navy-900/45 leading-relaxed">{item.detail}</p>
+                      <p className={`text-xs text-navy-900/45 leading-relaxed ${pending ? 'animate-pulse' : ''}`}>{item.detail}</p>
                     </div>
                   ))}
 
                   <button
-                    onClick={() => { setStep('form'); setFormPage(0); setResults(null) }}
+                    onClick={() => { stream.reset(); setFormPage(0) }}
                     className="btn-primary w-full justify-center text-sm mt-2"
                   >
                     Re-Analyze My Finances
                   </button>
                 </motion.div>
               </div>
+              <div className="max-w-3xl mx-auto">
+                <ResultFooter
+                  meta={results.meta}
+                  citations={stream.citations}
+                  pending={pending}
+                  module="health-score"
+                  askContext={`Health score ${results.overall}/100 (${results.overallLabel}); biggest opportunity: ${results.biggestOpportunity}`}
+                  suggestions={['How much term insurance do I need?', 'Is 80D available in the new regime?', 'What counts as an emergency fund?']}
+                />
+              </div>
+              </>)}
             </motion.div>
           )}
         </AnimatePresence>

@@ -174,8 +174,8 @@ public class PortfolioEngine {
             }
         }
         for (var o : overlap) {
-            if (o.label().endsWith(" funds") && o.funds() >= 2) {
-                String cat = o.label().replace(" funds", "");
+            String cat = o.label().replace(" funds", "");
+            if (byCat.containsKey(cat) && o.funds() >= 2) { // real same-category overlap, not the large-cap-tilt note
                 double smaller = funds.stream().filter(f -> f.category().equals(cat)).sorted(Comparator.comparingDouble(Fund::value).reversed())
                         .skip(1).mapToDouble(Fund::value).sum();
                 actions.add(new Action("CONSOLIDATE", o.funds() + " " + cat + " funds → 1",

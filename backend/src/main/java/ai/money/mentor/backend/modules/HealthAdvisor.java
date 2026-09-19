@@ -83,15 +83,16 @@ public class HealthAdvisor implements ModuleAdvisor {
         StringBuilder slotBrief = new StringBuilder();
         for (int i = 0; i < slots.size(); i++) {
             var s = slots.get(i);
-            slotBrief.append(i + 1).append(". ").append(s.priority()).append(" — ").append(s.dim().label()).append(" (")
-                    .append(s.dim().value()).append("/100): ").append(s.detail()).append('\n');
+            slotBrief.append("Slot ").append(i + 1).append(" · focus: ").append(s.dim().label())
+                    .append("\n  facts: ").append(s.detail()).append('\n');
         }
         var task = new NarrativeTask<>(HealthNarrative.class, """
                 MODULE: Money Health Score.
                 RECOMMENDATION SLOTS (keep this order and focus; improve the wording, keep the facts):
                 %s
-                For each slot write a short title and a 2-sentence detail with one concrete next step. For slot 4 ("Good"),
-                praise the strength briefly. Only quote ₹ figures that appear in CALCULATIONS.""".formatted(slotBrief),
+                For each slot write: title = a short action phrase of 3-8 words (e.g. "Top up your emergency fund"),
+                with no scores, colons or priority words; detail = 2 sentences with one concrete next step.
+                Slot 4 is a strength: praise it briefly. Only quote ₹ figures that appear in CALCULATIONS.""".formatted(slotBrief),
                 n -> {
                     List<String> t = new ArrayList<>();
                     if (n.recommendations() != null) n.recommendations().forEach(x -> { t.add(x.title()); t.add(x.detail()); });
@@ -102,7 +103,7 @@ public class HealthAdvisor implements ModuleAdvisor {
                     var arr = (ArrayNode) res.get("recommendations");
                     for (int i = 0; i < slots.size(); i++) {
                         var x = n.recommendations().get(i);
-                        if (x.title() != null && !x.title().isBlank()) ((ObjectNode) arr.get(i)).put("title", x.title());
+                        if (isShortTitle(x.title())) ((ObjectNode) arr.get(i)).put("title", x.title().trim());
                         if (x.detail() != null && !x.detail().isBlank()) ((ObjectNode) arr.get(i)).put("detail", x.detail());
                     }
                 });
@@ -111,6 +112,12 @@ public class HealthAdvisor implements ModuleAdvisor {
         return new Prepared(r, c.trace(), queryFor(worst.key()) + " " + queryFor(slots.get(1).dim().key()),
                 rules.defaultTaxYear(), task,
                 "Health score " + c.overall() + "/100 (" + c.overallLabel() + "); weakest: " + worst.label(), null);
+    }
+
+    /** Small models sometimes echo the brief as the title; keep the engine's title unless it's a real short phrase. */
+    static boolean isShortTitle(String t) {
+        if (t == null || t.isBlank() || t.length() > 60) return false;
+        return !t.contains(":") && !t.contains("/100") && !t.matches("(?i)^(critical|high|medium|good|slot)\\b.*");
     }
 
     private List<Slot> slots(List<Dimension> dims, CalcTrace t) {

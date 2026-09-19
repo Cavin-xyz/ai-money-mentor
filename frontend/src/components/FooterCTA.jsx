@@ -53,8 +53,8 @@ export default function FooterCTA() {
           </h2>
 
           <p className="text-white/50 max-w-lg mx-auto text-lg leading-relaxed mb-10">
-            Stop guessing and start growing with AI-powered financial
-            guidance tailored to your goals.
+            Calculated by an engine you can inspect, grounded in SEBI, RBI and
+            Income Tax sources, explained privately on your own laptop.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -73,7 +73,7 @@ export default function FooterCTA() {
           </div>
 
           <p className="mt-6 text-xs text-white/30">
-            No jargon. No spam. Just clarity. ✦ Cancel anytime.
+            No account. No cloud AI. Your numbers never leave this laptop.
           </p>
         </motion.div>
 
@@ -89,13 +89,13 @@ export default function FooterCTA() {
               <Zap size={11} className="text-navy-900" />
             </div>
             <span className="font-bold text-sm text-navy-900">
-              AI<span className="text-navy-600">Money</span>Mentor
+              Money<span className="text-navy-600">Mentor</span>
             </span>
-            <span className="text-navy-900/25 text-xs ml-2">by ET Markets</span>
+            <span className="text-navy-900/25 text-xs ml-2">runs on your device</span>
           </div>
 
           <div className="flex flex-wrap gap-6 justify-center">
-            {['Privacy Policy', 'Terms of Service', 'SEBI Disclosure', 'Contact', 'Blog'].map(link => (
+            {['Privacy Policy'].map(link => (
               <a
                 key={link}
                 href="#"
@@ -112,14 +112,15 @@ export default function FooterCTA() {
             ))}
           </div>
 
-          <p className="text-xs text-navy-900/30">© 2026 ET Money Mentor</p>
+          <p className="text-xs text-navy-900/30">© 2026 Money Mentor</p>
         </motion.div>
 
         {/* Disclaimer */}
         <p className="mt-6 text-center text-[11px] text-navy-900/25 leading-relaxed max-w-3xl mx-auto">
-          Disclaimer: AI Money Mentor provides educational financial information and should not be construed as
-          personalised financial advice. All investments are subject to market risk. Please consult a SEBI-registered
-          investment advisor before making investment decisions.
+          Disclaimer: Money Mentor provides educational guidance generated on this device and is not investment, tax or
+          legal advice. Numbers come from a deterministic calculator and rules come from official sources, but all
+          investments are subject to market risk. Consult a SEBI-registered investment adviser or a Chartered Accountant
+          before acting.
         </p>
       </div>
 

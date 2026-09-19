@@ -73,6 +73,18 @@
       "confirmed": false
     }
   },
+  "scam": {
+    "verificationStatus": "T2: confirm SEBI's @valid UPI handle format and category tags against the SEBI circular; add an RBI digital-lending-app snapshot at data/rbi/dla.json",
+    "sebiUpiDomainPrefix": "valid",
+    "sebiUpiCategoryTags": ["brk", "mf"],
+    "sebiUpiSource": "https://www.sebi.gov.in",
+    "helplines": [
+      { "label": "Call 1930 (cyber fraud helpline)", "url": "tel:1930" },
+      { "label": "Report on cybercrime.gov.in", "url": "https://cybercrime.gov.in" },
+      { "label": "Verify on SEBI Check", "url": "https://www.sebi.gov.in" },
+      { "label": "Report to RBI Sachet", "url": "https://sachet.rbi.org.in" }
+    ]
+  },
   "rules": {
     "ppfRatePct": { "value": 7.1, "authority": "Ministry of Finance (small savings)", "source": "https://dea.gov.in", "confirmed": false },
     "ssyRatePct": { "value": 8.2, "authority": "Ministry of Finance (small savings)", "source": "https://dea.gov.in", "confirmed": false },

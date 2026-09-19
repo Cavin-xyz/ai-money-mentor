@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, Cpu, Lock, Calculator, BookOpenCheck } from 'lucide-react'
+import { useProfile } from '../context/ProfileContext'
 
 export default function HeroSection() {
+  const { hasProfile, profile } = useProfile()
   const scrollToFire = (e) => {
     e.preventDefault()
     const el = document.getElementById('fire')
@@ -27,17 +29,18 @@ export default function HeroSection() {
               transition={{ duration: 0.5 }}
             >
               <div className="section-tag mb-5">
-                <Sparkles size={11} />
-                Powered by ET Markets Data
+                <Cpu size={11} />
+                Runs 100% on your device
               </div>
+              {hasProfile && <p className="text-sm font-semibold text-navy-900/60 mb-2">Welcome back, {profile.name}.</p>}
               <h1 className="text-5xl sm:text-6xl font-extrabold leading-[1.1] tracking-tight text-navy-900">
                 Stop Guessing.
                 <br />
                 <span className="gradient-text">Start Growing.</span>
               </h1>
               <p className="mt-5 text-lg text-navy-900/55 leading-relaxed max-w-lg">
-                The AI-powered mentor that turns India's savers into confident investors.
-                Get your FIRE path in <span className="text-navy-900 font-semibold">60 seconds</span>.
+                Every number calculated. Every rule cited. <span className="text-navy-900 font-semibold">Nothing leaves this laptop.</span>
+                A private money mentor for India, grounded in SEBI, RBI and Income Tax sources.
               </p>
             </motion.div>
 
@@ -52,6 +55,17 @@ export default function HeroSection() {
               >
                 Get My FIRE Plan <ArrowRight size={15} />
               </button>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {[
+                  [Lock, 'Private — no cloud AI'],
+                  [Calculator, 'Calculated, not guessed'],
+                  [BookOpenCheck, 'Cited from SEBI · RBI · IT Dept'],
+                ].map(([Icon, label]) => (
+                  <span key={label} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-navy-900/10 text-xs font-medium text-navy-900/65">
+                    <Icon size={12} className="text-emerald-600" /> {label}
+                  </span>
+                ))}
+              </div>
             </motion.div>
           </div>
 

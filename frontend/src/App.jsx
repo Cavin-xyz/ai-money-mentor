@@ -1,31 +1,42 @@
 import './index.css'
+import { ProfileProvider } from './context/ProfileContext'
 import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
+import ProfileBanner from './components/ProfileBanner'
+import FeatureBentoGrid from './components/FeatureBentoGrid'
+import ArchitectureSection from './components/ArchitectureSection'
+import FirePathPlanner from './components/FirePathPlanner'
 import MoneyHealthScore from './components/MoneyHealthScore'
 import TaxWizard from './components/TaxWizard'
-import FeatureBentoGrid from './components/FeatureBentoGrid'
 import LifeEventAdvisor from './components/LifeEventAdvisor'
 import CouplesMoneyPlanner from './components/CouplesMoneyPlanner'
 import PortfolioXRay from './components/PortfolioXRay'
-import FirePathPlanner from './components/FirePathPlanner'
+import ScamShield from './components/ScamShield'
 import FooterCTA from './components/FooterCTA'
+import ProfileDrawer from './components/ProfileDrawer'
 
 function App() {
   return (
-    <div className="min-h-screen overflow-x-hidden">
-      <Navbar />
-      <main>
-        <HeroSection />
-        <FeatureBentoGrid />
-        <FirePathPlanner />
-        <MoneyHealthScore />
-        <TaxWizard />
-        <LifeEventAdvisor />
-        <CouplesMoneyPlanner />
-        <PortfolioXRay />
-      </main>
-      <FooterCTA />
-    </div>
+    <ProfileProvider>
+      <div className="min-h-screen overflow-x-hidden">
+        <Navbar />
+        <main>
+          <HeroSection />
+          <ProfileBanner />
+          <FeatureBentoGrid />
+          <ArchitectureSection />
+          <FirePathPlanner />
+          <MoneyHealthScore />
+          <TaxWizard />
+          <LifeEventAdvisor />
+          <CouplesMoneyPlanner />
+          <PortfolioXRay />
+          <ScamShield />
+        </main>
+        <FooterCTA />
+        <ProfileDrawer />
+      </div>
+    </ProfileProvider>
   )
 }
 

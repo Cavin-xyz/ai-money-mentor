@@ -37,3 +37,9 @@ export function timeAgo(iso) {
   if (diff < 86400) return `${Math.floor(diff / 3600)} h ago`
   return `${Math.floor(diff / 86400)} d ago`
 }
+
+/** "Sec 123 (formerly 80C)" for a citation, or null. */
+export function sectionLabel(c) {
+  if (!c?.section) return null
+  return c.sectionOld ? `Sec ${c.section} (formerly ${c.sectionOld})` : `Sec ${c.section}`
+}

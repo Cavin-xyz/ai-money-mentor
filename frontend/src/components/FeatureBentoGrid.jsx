@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { ScanLine, Calculator, Users, LayoutGrid, ArrowRight, Flame, Lightbulb, Activity } from 'lucide-react'
+import { ScanLine, Calculator, Users, LayoutGrid, ArrowRight, Flame, Lightbulb, Activity, ShieldAlert } from 'lucide-react'
 
 const scrollTo = (href) => {
   const el = document.getElementById(href.slice(1))
@@ -18,7 +18,7 @@ const features = [
     iconBg: 'bg-blue-50 border-blue-200',
     tag: 'Portfolio X-Ray',
     title: 'Instant Portfolio Audit',
-    desc: 'Upload your CAMS/KFintech PDF and get AI-powered analysis of fund overlap, hidden commissions, and a rebalancing plan.',
+    desc: 'Upload your CAMS/KFintech statement — parsed on your laptop, matched to AMFI data. See overlap, real XIRR and what Regular plans cost you.',
     href: '#xray',
   },
   {
@@ -27,7 +27,7 @@ const features = [
     iconBg: 'bg-amber-50 border-amber-200',
     tag: 'Tax Wizard',
     title: 'Old vs. New Regime',
-    desc: 'AI chatbot that compares both tax regimes for your specific salary, finds missed deductions, and optimizes your structure.',
+    desc: 'Old vs New regime calculated to the rupee for Tax Year 2026-27, with answers cited from Income Tax Department sources.',
     href: '#tax',
   },
   {
@@ -36,15 +36,16 @@ const features = [
     iconBg: 'bg-purple-50 border-purple-200',
     tag: "Couple's Planner",
     title: 'Optimize Together',
-    desc: 'Enter both partners\' financial profiles to get AI-powered cross-income tax optimization and joint investment strategies.',
+    desc: 'Both partners run through the tax engine; every suggested move is priced by recomputing the tax, plus fair ways to split costs.',
     href: '#couples',
   },
 ]
 
 const miniFeatures = [
-  { icon: Flame, title: 'FIRE Path Planner', desc: 'Month-by-month AI roadmap to retire early on your terms.', href: '#fire' },
-  { icon: Lightbulb, title: 'Life Event Advisor', desc: 'Bonus? Baby? Marriage? AI guidance on every financial milestone.', href: '#advisor' },
-  { icon: Activity, title: 'AI Health Score', desc: 'Comprehensive AI-powered financial wellness score with recommendations.', href: '#health' },
+  { icon: Flame, title: 'FIRE Path Planner', desc: 'Required SIP, glide path and 1,000 market scenarios, with instant what-ifs.', href: '#fire' },
+  { icon: Lightbulb, title: 'Life Event Advisor', desc: 'Bonus, baby, home or new job: tax, EMIs and health-score impact.', href: '#advisor' },
+  { icon: Activity, title: 'Money Health Score', desc: 'Six dimensions scored by visible formulas, not AI guesses.', href: '#health' },
+  { icon: ShieldAlert, title: 'Scam Shield', desc: 'Check a message, UPI ID or loan app against SEBI and RBI rules.', href: '#scam' },
 ]
 
 const cardVariants = {
@@ -78,7 +79,7 @@ export default function FeatureBentoGrid() {
             Everything You Need to <span className="gradient-text">Grow Wealth</span>
           </h2>
           <p className="mt-4 text-navy-900/50 max-w-lg mx-auto">
-            Six AI-powered modules that cover every dimension of your financial life.
+            Seven tools. Each one calculates with a deterministic engine, cites official sources and explains with an AI that never leaves your laptop.
           </p>
         </motion.div>
 
@@ -112,7 +113,7 @@ export default function FeatureBentoGrid() {
         </div>
 
         {/* Mini feature cards */}
-        <div className="mt-5 grid md:grid-cols-3 gap-4">
+        <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {miniFeatures.map((f, i) => (
             <motion.div
               key={f.title}
