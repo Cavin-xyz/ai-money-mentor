@@ -124,15 +124,22 @@ public class PortfolioAdvisor implements ModuleAdvisor {
                 Never suggest a new named scheme or fund house; category-level only (e.g. "a Nifty 50 index fund").""".formatted(n, brief),
                 x -> {
                     List<String> t = new ArrayList<>();
-                    t.add(x.summary());
+                    t.add(x.summary() != null ? x.summary() : "");
                     if (x.actionReasons() != null) t.addAll(x.actionReasons());
                     return t;
                 },
                 (res, x) -> {
                     if (x.summary() != null && !x.summary().isBlank()) res.put("summary", x.summary());
-                    if (x.actionReasons() != null && x.actionReasons().size() == n) {
-                        var arr = (ArrayNode) res.get("rebalancing");
-                        for (int i = 0; i < n; i++) ((ObjectNode) arr.get(i)).put("reason", x.actionReasons().get(i));
+                    if (x.actionReasons() != null && x.actionReasons().size() == n && n > 0) {
+                        var arr = res.get("rebalancing");
+                        if (arr instanceof ArrayNode) {
+                            ArrayNode rebArray = (ArrayNode) arr;
+                            for (int i = 0; i < n; i++) {
+                                if (i < rebArray.size() && rebArray.get(i) instanceof ObjectNode) {
+                                    ((ObjectNode) rebArray.get(i)).put("reason", x.actionReasons().get(i));
+                                }
+                            }
+                        }
                     }
                 });
 

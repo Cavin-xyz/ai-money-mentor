@@ -2,7 +2,7 @@
 rem ---------------------------------------------------------------------------
 rem  FinMind - start backend + frontend for development
 rem
-rem    run.bat            start Qdrant, Ollama, backend (:8080) and frontend (:5173)
+rem    run.bat            start Qdrant, Ollama, backend (:8080) and frontend (:5174)
 rem    run.bat stop       stop backend and frontend
 rem    run.bat stop all   also stop Qdrant and Ollama
 rem    run.bat nobrowser  start without opening the browser
@@ -71,12 +71,12 @@ if errorlevel 1 (
 )
 
 rem 4. Frontend
-curl -s -o nul -m 2 http://localhost:5173
+curl -s -o nul -m 2 http://localhost:5174
 if errorlevel 1 (
   echo   [..] Starting frontend in a new window
   start "Money Mentor - frontend" cmd /k "cd /d "%ROOT%frontend" & (if not exist node_modules call npm install) & npm run dev"
 ) else (
-  echo   [ok] Frontend already running on :5173
+  echo   [ok] Frontend already running on :5174
 )
 
 rem 5. Wait until both answer, then open the browser
@@ -95,7 +95,7 @@ goto waitbackend
 :waitfrontend
 set /a tries=0
 :waitfrontendloop
-curl -s -o nul -m 2 http://localhost:5173 && goto ready
+curl -s -o nul -m 2 http://localhost:5174 && goto ready
 set /a tries+=1
 if %tries% geq 60 (
   echo   [!] Frontend is taking long - check the "Money Mentor - frontend" window
@@ -106,16 +106,16 @@ goto waitfrontendloop
 
 :ready
 echo.
-echo   Ready:  http://localhost:5173   (API on http://localhost:8080)
+echo   Ready:  http://localhost:5174   (API on http://localhost:8080)
 echo   Stop with:  run.bat stop
-if /i not "%~1"=="nobrowser" start "" http://localhost:5173
+if /i not "%~1"=="nobrowser" start "" http://localhost:5174
 goto end
 
 :stop
 echo   Stopping backend and frontend...
 taskkill /fi "WINDOWTITLE eq Money Mentor - backend*" /t /f >nul 2>&1
 taskkill /fi "WINDOWTITLE eq Money Mentor - frontend*" /t /f >nul 2>&1
-powershell -NoProfile -Command "foreach ($p in 8080, 5173) { Get-NetTCPConnection -LocalPort $p -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } }"
+powershell -NoProfile -Command "foreach ($p in 8080, 5174) { Get-NetTCPConnection -LocalPort $p -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } }"
 if /i "%~2"=="all" (
   echo   Stopping Qdrant and Ollama...
   taskkill /im qdrant.exe /f >nul 2>&1

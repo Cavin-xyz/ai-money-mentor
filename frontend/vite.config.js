@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    port: 5174,
+    strictPort: true,
     // Same-origin API calls in dev; in production Spring Boot serves the built app.
     proxy: {
       '/api': 'http://localhost:8080',

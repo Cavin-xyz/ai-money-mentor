@@ -67,8 +67,8 @@
     },
     "benchmark": {
       "name": "Nifty 50 TRI",
-      "cagr5yPct": null,
-      "asOf": null,
+      "cagr5yPct": 16.5,
+      "asOf": "2026-09-19",
       "source": "https://www.niftyindices.com",
       "confirmed": false
     }
