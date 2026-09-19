@@ -11,26 +11,20 @@ import ExplainPanel from './trust/ExplainPanel'
 import { TrustBadge, Disclaimer } from './trust/Badges'
 
 const TAX_YEARS = [
-  { key: '2026-27', label: 'TY 2026-27', sub: 'Income-tax Act 2025' },
-  { key: '2025-26', label: 'FY 2025-26', sub: 'filing now · 1961 Act' },
+  { key: '2026-27', label: 'sources.ty' },
+  { key: '2025-26', label: 'tax.fy' },
 ]
 
 const FIELDS = [
-  ['grossSalary', 'Gross salary (annual)', true],
-  ['basicSalary', 'Basic pay (annual)', false],
-  ['hraReceived', 'HRA received (annual)', false],
-  ['rentPaid', 'Rent paid (annual)', false],
-  ['sec80C', 'Sec 123 / 80C investments', false],
-  ['sec80D', 'Health insurance (80D)', false],
-  ['sec80CCD1B', 'Own NPS (80CCD(1B))', false],
-  ['employerNps', 'Employer NPS (80CCD(2))', false],
-  ['homeLoanInterest', 'Home-loan interest', false],
-]
-
-const SUGGESTIONS = [
-  'Can I claim 80C under the new regime?',
-  'Which regime is better for a ₹15L salary?',
-  'What changed in the Income-tax Act 2025?',
+  ['grossSalary', 'tax.f.gross', true],
+  ['basicSalary', 'tax.f.basic', false],
+  ['hraReceived', 'tax.f.hra', false],
+  ['rentPaid', 'tax.f.rent', false],
+  ['sec80C', 'tax.f.80c', false],
+  ['sec80D', 'tax.f.80d', false],
+  ['sec80CCD1B', 'tax.f.nps', false],
+  ['employerNps', 'tax.f.empNps', false],
+  ['homeLoanInterest', 'tax.f.homeLoan', false],
 ]
 
 const inputClass = 'w-full bg-navy-900/[0.03] border border-navy-900/10 rounded-lg px-3 py-2 text-sm text-navy-900 font-mono font-semibold focus:outline-none focus:border-navy-900/30 placeholder-navy-900/25'
@@ -46,6 +40,7 @@ function Row({ label, a, b, strong }) {
 }
 
 function RegimeCard({ taxYear, inputs, setInputs, result, setResult }) {
+  const { t, p } = useLanguage()
   const [editing, setEditing] = useState(!result)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
@@ -55,7 +50,7 @@ function RegimeCard({ taxYear, inputs, setInputs, result, setResult }) {
 
   const compare = async (values = inputs) => {
     if (!Number(values.grossSalary)) {
-      setError('Enter your annual gross salary')
+      setError('tax.card.errGross')
       return
     }
     setBusy(true)
@@ -108,7 +103,7 @@ function RegimeCard({ taxYear, inputs, setInputs, result, setResult }) {
 
   const o = result?.oldRegime
   const n = result?.newRegime
-  const winnerLabel = result?.winner === 'new' ? 'New regime' : result?.winner === 'old' ? 'Old regime' : 'Both equal'
+  const winnerLabel = t(result?.winner === 'new' ? 'tax.new' : result?.winner === 'old' ? 'tax.old' : 'tax.equal')
 
   return (
     <div className="glass-card p-5 space-y-4">
@@ -116,12 +111,12 @@ function RegimeCard({ taxYear, inputs, setInputs, result, setResult }) {
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center"><Calculator size={15} className="text-amber-600" /></div>
           <div>
-            <h3 className="text-sm font-bold text-navy-900">Old vs New regime</h3>
-            <p className="text-[11px] text-navy-900/45">Calculated to the rupee — no AI arithmetic</p>
+            <h3 className="text-sm font-bold text-navy-900">{t('tax.card.title')}</h3>
+            <p className="text-[11px] text-navy-900/45">{t('tax.card.sub')}</p>
           </div>
         </div>
         {result && !editing && (
-          <button onClick={() => setEditing(true)} className="flex items-center gap-1 text-[11px] font-semibold text-navy-900/50 hover:text-navy-900"><PencilLine size={12} /> Edit</button>
+          <button onClick={() => setEditing(true)} className="flex items-center gap-1 text-[11px] font-semibold text-navy-900/50 hover:text-navy-900"><PencilLine size={12} /> {t('common.edit')}</button>
         )}
       </div>
 
@@ -131,95 +126,94 @@ function RegimeCard({ taxYear, inputs, setInputs, result, setResult }) {
         <div className="space-y-3">
           <div className="flex items-start justify-between gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
             <div>
-              <p className="text-xs font-bold text-emerald-800 flex items-center gap-1.5"><FileCheck2 size={13} /> Read from your Form 16</p>
-              <p className="text-[11px] text-emerald-700/80">{form16.employer || 'Employer not found'}{form16.financialYear ? ` · FY ${form16.financialYear}` : ''}{form16.tds ? ` · TDS ${formatINR(form16.tds)}` : ''}</p>
-              <p className="text-[10px] text-emerald-700/60 mt-1">Read on this laptop; the file was not stored. Check every figure.</p>
+              <p className="text-xs font-bold text-emerald-800 flex items-center gap-1.5"><FileCheck2 size={13} /> {t('tax.card.form16Read')}</p>
+              <p className="text-[11px] text-emerald-700/80">{form16.employer || t('tax.card.noEmployer')}{form16.financialYear ? ` · ${t('tax.fy', { year: form16.financialYear })}` : ''}{form16.tds ? ` · TDS ${formatINR(form16.tds)}` : ''}</p>
+              <p className="text-[10px] text-emerald-700/60 mt-1">{t('tax.card.form16Note')}</p>
             </div>
-            <button onClick={() => setForm16(null)} className="p-1 text-emerald-700/60 hover:text-emerald-800" aria-label="Discard"><X size={14} /></button>
+            <button onClick={() => setForm16(null)} className="p-1 text-emerald-700/60 hover:text-emerald-800" aria-label={t('tax.card.discard')}><X size={14} /></button>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {FIELDS.map(([k, label]) => (
               <label key={k} className="block">
-                <span className="block text-[10px] font-semibold text-navy-900/45 mb-0.5">{label}</span>
+                <span className="block text-[10px] font-semibold text-navy-900/45 mb-0.5">{t(label)}</span>
                 <input className={inputClass} value={form16.values[k] ?? ''} onChange={(e) => setForm16((f) => ({ ...f, values: { ...f.values, [k]: e.target.value } }))} />
               </label>
             ))}
           </div>
-          <button onClick={useForm16} className="btn-primary w-full text-xs">Use these numbers</button>
+          <button onClick={useForm16} className="btn-primary w-full text-xs">{t('tax.card.useNumbers')}</button>
         </div>
       ) : editing ? (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
             {FIELDS.map(([k, label, req]) => (
               <label key={k} className={`block ${k === 'grossSalary' ? 'col-span-2' : ''}`}>
-                <span className="block text-[10px] font-semibold text-navy-900/45 mb-0.5">{label}{req ? ' *' : ''}</span>
-                <input className={inputClass} inputMode="numeric" placeholder={req ? 'e.g. 1800000' : '0'} value={inputs[k] ?? ''} onChange={(e) => setInputs((v) => ({ ...v, [k]: e.target.value }))} />
+                <span className="block text-[10px] font-semibold text-navy-900/45 mb-0.5">{t(label)}{req ? ' *' : ''}</span>
+                <input className={inputClass} inputMode="numeric" placeholder={req ? t('common.eg', { v: 1800000 }) : '0'} value={inputs[k] ?? ''} onChange={(e) => setInputs((v) => ({ ...v, [k]: e.target.value }))} />
               </label>
             ))}
           </div>
           <div className="flex gap-2">
             <button onClick={() => compare()} disabled={busy} className="btn-primary flex-1 text-xs flex items-center justify-center gap-1.5">
-              {busy ? <Loader2 size={13} className="animate-spin" /> : <Calculator size={13} />} Compare regimes
+              {busy ? <Loader2 size={13} className="animate-spin" /> : <Calculator size={13} />} {t('tax.card.compare')}
             </button>
             <button onClick={() => fileRef.current?.click()} disabled={reading} className="btn-ghost text-xs flex items-center gap-1.5">
-              {reading ? <Loader2 size={13} className="animate-spin" /> : <UploadCloud size={13} />} Form 16
+              {reading ? <Loader2 size={13} className="animate-spin" /> : <UploadCloud size={13} />} {t('tax.card.form16')}
             </button>
           </div>
-          {reading && <p className="text-[11px] text-navy-900/50">Reading your Form 16 on this laptop…</p>}
+          {reading && <p className="text-[11px] text-navy-900/50">{t('tax.card.reading')}</p>}
         </div>
       ) : result && (
         <div className="space-y-4">
           <div className={`p-3 rounded-xl border text-center ${result.winner === 'equal' ? 'bg-navy-900/[0.03] border-navy-900/10' : 'bg-emerald-50 border-emerald-200'}`}>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 flex items-center justify-center gap-1"><Trophy size={12} /> Better for you</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 flex items-center justify-center gap-1"><Trophy size={12} /> {t('tax.card.better')}</p>
             <p className="text-lg font-extrabold text-navy-900">{winnerLabel}</p>
-            {result.savings > 0 && <p className="text-xs text-emerald-700 font-semibold">You save {formatINR(result.savings)} a year</p>}
-            <p className="text-[10px] text-navy-900/40 mt-0.5">{result.taxYearLabel} · {result.act}</p>
+            {result.savings > 0 && <p className="text-xs text-emerald-700 font-semibold">{t('tax.card.save', { amount: formatINR(result.savings) })}</p>}
+            <p className="text-[10px] text-navy-900/40 mt-0.5">{p(result.taxYearLabel)} · {p(result.act)}</p>
           </div>
           <div>
             <div className="grid grid-cols-[1fr_auto_auto] gap-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-navy-900/40">
               <span />
-              <span className="w-24 text-right">Old</span>
-              <span className="w-24 text-right">New</span>
+              <span className="w-24 text-right">{t('tax.col.old')}</span>
+              <span className="w-24 text-right">{t('tax.col.new')}</span>
             </div>
-            <Row label="Gross income" a={formatINR(o.grossIncome)} b={formatINR(n.grossIncome)} />
-            <Row label="Deductions" a={formatINR(o.totalDeductions)} b={formatINR(n.totalDeductions)} />
-            <Row label="Taxable income" a={formatINR(o.taxableIncome)} b={formatINR(n.taxableIncome)} />
-            <Row label="Tax on slabs" a={formatINR(o.slabTax)} b={formatINR(n.slabTax)} />
-            <Row label="Rebate (Sec 156 / 87A)" a={`−${formatINR(o.rebate + o.marginalRelief)}`} b={`−${formatINR(n.rebate + n.marginalRelief)}`} />
-            <Row label="Cess 4%" a={formatINR(o.cess)} b={formatINR(n.cess)} />
-            <Row label="Total tax" a={formatINR(o.totalTax)} b={formatINR(n.totalTax)} strong />
+            <Row label={t('tax.row.gross')} a={formatINR(o.grossIncome)} b={formatINR(n.grossIncome)} />
+            <Row label={t('tax.row.deductions')} a={formatINR(o.totalDeductions)} b={formatINR(n.totalDeductions)} />
+            <Row label={t('tax.row.taxable')} a={formatINR(o.taxableIncome)} b={formatINR(n.taxableIncome)} />
+            <Row label={t('tax.row.slabs')} a={formatINR(o.slabTax)} b={formatINR(n.slabTax)} />
+            <Row label={t('tax.row.rebate')} a={`−${formatINR(o.rebate + o.marginalRelief)}`} b={`−${formatINR(n.rebate + n.marginalRelief)}`} />
+            <Row label={t('tax.row.cess')} a={formatINR(o.cess)} b={formatINR(n.cess)} />
+            <Row label={t('tax.row.total')} a={formatINR(o.totalTax)} b={formatINR(n.totalTax)} strong />
           </div>
           {result.gaps?.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40">Unused deductions (old regime only)</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40">{t('tax.card.gaps')}</p>
               {result.gaps.map((g) => (
                 <div key={g.key} className="flex items-center justify-between text-xs p-2 rounded-lg bg-navy-900/[0.02] border border-navy-900/[0.05]">
-                  <span className="text-navy-900/70">{g.section} <span className="text-navy-900/40">· {formatINR(g.headroom)} unused</span></span>
-                  <span className="font-semibold text-emerald-700">saves {formatINR(g.oldRegimeSaving)}</span>
+                  <span className="text-navy-900/70">{g.section} <span className="text-navy-900/40">· {t('tax.card.unused', { amount: formatINR(g.headroom) })}</span></span>
+                  <span className="font-semibold text-emerald-700">{t('tax.card.saves', { amount: formatINR(g.oldRegimeSaving) })}</span>
                 </div>
               ))}
               {result.breakEvenExtraDeductions > 0 && (
-                <p className="text-[11px] text-navy-900/50">The old regime only wins if you claim about {formatINR(result.breakEvenExtraDeductions)} more in deductions.</p>
+                <p className="text-[11px] text-navy-900/50">{t('tax.card.breakEven', { amount: formatINR(result.breakEvenExtraDeductions) })}</p>
               )}
             </div>
           )}
           <ExplainPanel calculations={result.calculations} assumptions={result.assumptions} />
         </div>
       )}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500">{t(error)}</p>}
     </div>
   )
 }
 
 export default function TaxWizard() {
   const { refresh } = useProfile()
-  const { lang } = useLanguage()
+  const { lang, t } = useLanguage()
   const [taxYear, setTaxYear] = useState('2026-27')
   const [inputs, setInputs] = useState({})
   const [comparison, setComparison] = useState(null)
-  const [messages, setMessages] = useState([
-    { role: 'assistant', text: "Hi! I'm your Tax Wizard, running entirely on this laptop. Ask about deductions or regimes — answers come from official Income Tax Department sources, and any Old vs New numbers come from the calculator on the right." },
-  ])
+  // The greeting is rendered from i18n so it follows the language; it is not sent as history.
+  const [messages, setMessages] = useState([{ role: 'assistant', greeting: true, text: '' }])
   const [inputValue, setInputValue] = useState('')
   const [busy, setBusy] = useState(false)
   const chatRef = useRef(null)
@@ -243,7 +237,7 @@ export default function TaxWizard() {
     setBusy(true)
     try {
       const taxInputs = comparison ? inputs : undefined
-      await streamSse('/api/tax/wizard/stream', { history: history.map(({ role, text: t }) => ({ role, text: t })), taxInputs, taxYear }, {
+      await streamSse('/api/tax/wizard/stream', { history: history.filter((m) => !m.greeting).map(({ role, text }) => ({ role, text })), taxInputs, taxYear }, {
         token: (d) => updateLast((m) => ({ ...m, text: m.text + d.t })),
         sources: (d) => updateLast((m) => ({ ...m, citations: d.citations || [] })),
         result: (d) => updateLast((m) => ({ ...m, text: d.answer, trust: d.trust, streaming: false })),
@@ -262,17 +256,17 @@ export default function TaxWizard() {
     <section id="tax" className="py-24 relative overflow-hidden scroll-mt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         <div className="text-center mb-8">
-          <div className="section-tag mx-auto mb-4"><Sparkles size={11} /> Grounded in official sources</div>
+          <div className="section-tag mx-auto mb-4"><Sparkles size={11} /> {t('tax.tag')}</div>
           <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-navy-900 mb-4">
-            Meet the <span className="gradient-text">Tax Wizard</span>
+            {t('tax.title')} <span className="gradient-text">{t('tax.titleAccent')}</span>
           </h2>
           <p className="text-navy-900/55 text-lg max-w-2xl mx-auto">
-            Old vs New regime calculated to the rupee, with answers cited from Income Tax Department documents.
+            {t('tax.sub')}
           </p>
         </div>
 
         <div className="flex justify-center mb-6">
-          <div role="radiogroup" aria-label="Tax year" className="inline-flex p-1 rounded-xl bg-navy-900/[0.05] border border-navy-900/10">
+          <div role="radiogroup" aria-label={t('tax.yearAria')} className="inline-flex p-1 rounded-xl bg-navy-900/[0.05] border border-navy-900/10">
             {TAX_YEARS.map((y) => (
               <button
                 key={y.key}
@@ -281,8 +275,8 @@ export default function TaxWizard() {
                 onClick={() => setTaxYear(y.key)}
                 className={`px-4 py-2 rounded-lg text-left transition-all ${taxYear === y.key ? 'bg-white shadow-sm' : 'hover:bg-white/50'}`}
               >
-                <span className="block text-xs font-bold text-navy-900">{y.label}</span>
-                <span className="block text-[10px] text-navy-900/45">{y.sub}</span>
+                <span className="block text-xs font-bold text-navy-900">{t(y.label, { year: y.key })}</span>
+                <span className="block text-[10px] text-navy-900/45">{t(`tax.year.${y.key}.sub`)}</span>
               </button>
             ))}
           </div>
@@ -297,9 +291,9 @@ export default function TaxWizard() {
                   <Sparkles size={20} className="text-navy-900/60" />
                 </div>
                 <div>
-                  <h3 className="text-navy-900 font-bold text-sm">Tax Wizard</h3>
+                  <h3 className="text-navy-900 font-bold text-sm">{t('tax.chat.name')}</h3>
                   <p className="text-xs text-green-600 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" /> On-device · {comparison ? 'using your numbers' : 'general questions'}
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500" /> {t(comparison ? 'tax.chat.withNumbers' : 'tax.chat.general')}
                   </p>
                 </div>
               </div>
@@ -320,10 +314,10 @@ export default function TaxWizard() {
                     <div className={`p-4 rounded-2xl text-sm leading-relaxed min-w-0 ${msg.role === 'user'
                       ? 'bg-navy-900 text-white rounded-tr-none whitespace-pre-wrap'
                       : `bg-white border rounded-tl-none space-y-3 ${msg.error ? 'border-red-200 text-red-600' : 'border-navy-900/[0.08]'}`}`}>
-                      {msg.role === 'user' ? msg.text : (
+                      {msg.role === 'user' ? msg.text : msg.greeting ? t('tax.chat.greeting') : msg.error ? t(msg.text) : (
                         <>
                           {msg.text ? <AnswerWithCitations text={msg.text} citations={msg.citations} streaming={msg.streaming} lang={lang} />
-                            : <span className="flex items-center gap-2 text-navy-900/40 text-xs"><Loader2 size={12} className="animate-spin" /> Searching official sources…</span>}
+                            : <span className="flex items-center gap-2 text-navy-900/40 text-xs"><Loader2 size={12} className="animate-spin" /> {t('tax.chat.searching')}</span>}
                           {!msg.streaming && msg.trust && <TrustBadge trust={msg.trust} compact />}
                           {msg.citations?.length > 0 && <SourceChips citations={msg.citations} compact />}
                         </>
@@ -337,7 +331,7 @@ export default function TaxWizard() {
             <div className="p-4 bg-white border-t border-navy-900/[0.08]">
               {messages.length <= 2 && (
                 <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
-                  {SUGGESTIONS.map((s) => (
+                  {[t('tax.suggest.1'), t('tax.suggest.2'), t('tax.suggest.3')].map((s) => (
                     <button key={s} onClick={() => send(s)} disabled={busy} className="flex-shrink-0 px-3 py-1.5 rounded-full border border-navy-900/15 bg-navy-900/[0.04] text-navy-900/60 text-xs hover:bg-navy-900/[0.08] transition-colors">
                       {s}
                     </button>
@@ -349,17 +343,17 @@ export default function TaxWizard() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
-                  placeholder="Ask your tax question…"
-                  aria-label="Ask your tax question"
+                  placeholder={t('tax.chat.placeholder')}
+                  aria-label={t('tax.chat.placeholder')}
                   className="w-full bg-navy-900/[0.03] border border-navy-900/10 rounded-xl px-4 py-3 pr-12 text-sm text-navy-900 placeholder-navy-900/30 focus:outline-none focus:border-navy-900/30 focus:ring-1 focus:ring-navy-900/20 resize-none max-h-32 min-h-[50px]"
                   rows={1}
                 />
-                <button onClick={() => send()} disabled={!inputValue.trim() || busy} className="absolute right-2 bottom-2 p-2 rounded-lg bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-50" aria-label="Send">
+                <button onClick={() => send()} disabled={!inputValue.trim() || busy} className="absolute right-2 bottom-2 p-2 rounded-lg bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-50" aria-label={t('tax.chat.send')}>
                   {busy ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                 </button>
               </div>
               <p className="text-[10px] text-navy-900/35 text-center mt-3 flex items-center justify-center gap-1">
-                <ShieldCheck size={11} /> Every ₹ figure is checked against the calculator. Consult a Chartered Accountant for complex cases.
+                <ShieldCheck size={11} /> {t('tax.chat.footer')}
               </p>
             </div>
           </div>

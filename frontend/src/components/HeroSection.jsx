@@ -17,7 +17,7 @@ function HeroPreview() {
   const { t, language } = useLanguage()
   const rows = [
     { key: 'old', label: t('preview.old'), note: t('preview.oldNote'), value: '₹2,96,400', share: 1, bar: 'bg-navy-900/15', text: 'text-navy-900/70' },
-    { key: 'new', label: t('preview.new'), note: 'Sec 202', value: '₹1,50,800', share: 0.509, bar: 'bg-emerald-500', text: 'text-emerald-700' },
+    { key: 'new', label: t('preview.new'), note: t('sources.sec', { s: 202 }), value: '₹1,50,800', share: 0.509, bar: 'bg-emerald-500', text: 'text-emerald-700' },
   ]
 
   return (
@@ -26,12 +26,12 @@ function HeroPreview() {
       animate={{ opacity: 1, y: 0 }}
       transition={spring(0.15)}
       className="relative mx-auto w-full max-w-[31rem] lg:ml-auto lg:mr-0"
-      aria-label="Example: FinMind comparing old and new tax regimes for an ₹18 lakh salary"
+      aria-label={t('preview.aria')}
     >
       <div className="relative rounded-[1.75rem] bg-white p-6 sm:p-7 sm:pb-24 ring-1 ring-navy-900/[0.06] shadow-[0_45px_90px_-45px_rgba(10,25,47,0.5)]">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-medium text-navy-900/45">{t('preview.title')} · TY 2026-27</p>
+            <p className="text-xs font-medium text-navy-900/45">{t('preview.title')} · {t('sources.ty', { year: '2026-27' })}</p>
             <p className="mt-1 text-sm font-semibold text-navy-900">
               {t('preview.gross')} <span className="font-mono tabular-nums">₹18,00,000</span>
             </p>
@@ -67,7 +67,7 @@ function HeroPreview() {
           {t('preview.save', { amount: '₹1,45,600' })}
         </div>
         <p className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-800 ring-1 ring-amber-100">
-          <span className="font-bold">S1</span> Income Tax Dept · Sec 202 (formerly 115BAC)
+          <span className="font-bold">S1</span> {t('preview.source')} · {t('sources.secFormerly', { s: 202, o: '115BAC' })}
         </p>
       </div>
 

@@ -29,17 +29,18 @@ export function formatPct(n, digits = 1) {
   return `${Number(n).toFixed(digits).replace(/\.0$/, '')}%`
 }
 
-export function timeAgo(iso) {
+/** "5 min ago" — `t` is the i18n lookup from useLanguage(). */
+export function timeAgo(iso, t) {
   if (!iso) return ''
   const diff = (Date.now() - new Date(iso).getTime()) / 1000
-  if (diff < 60) return 'just now'
-  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)} h ago`
-  return `${Math.floor(diff / 86400)} d ago`
+  if (diff < 60) return t('time.now')
+  if (diff < 3600) return t('time.min', { n: Math.floor(diff / 60) })
+  if (diff < 86400) return t('time.h', { n: Math.floor(diff / 3600) })
+  return t('time.d', { n: Math.floor(diff / 86400) })
 }
 
-/** "Sec 123 (formerly 80C)" for a citation, or null. */
-export function sectionLabel(c) {
+/** "Sec 123 (formerly 80C)" for a citation, or null. `t` is the i18n lookup from useLanguage(). */
+export function sectionLabel(c, t) {
   if (!c?.section) return null
-  return c.sectionOld ? `Sec ${c.section} (formerly ${c.sectionOld})` : `Sec ${c.section}`
+  return c.sectionOld ? t('sources.secFormerly', { s: c.section, o: c.sectionOld }) : t('sources.sec', { s: c.section })
 }

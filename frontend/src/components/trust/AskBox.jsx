@@ -9,7 +9,7 @@ import { useLanguage } from '../../context/LanguageContext'
 
 /** "Ask about this" — a follow-up question answered from official sources, with this result as context. */
 export default function AskBox({ module, context, suggestions = [] }) {
-  const { lang } = useLanguage()
+  const { lang, t } = useLanguage()
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
   const [answer, setAnswer] = useState('')
@@ -54,8 +54,8 @@ export default function AskBox({ module, context, suggestions = [] }) {
         <span className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
           <MessageCircleQuestion size={14} className="text-blue-600" />
         </span>
-        <span className="text-sm font-bold text-navy-900">Ask about this</span>
-        <span className="text-[11px] text-navy-900/40 hidden sm:inline">answered from official sources on this device</span>
+        <span className="text-sm font-bold text-navy-900">{t('ask.title')}</span>
+        <span className="text-[11px] text-navy-900/40 hidden sm:inline">{t('ask.sub')}</span>
       </button>
       <AnimatePresence initial={false}>
         {open && (
@@ -72,18 +72,18 @@ export default function AskBox({ module, context, suggestions = [] }) {
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="e.g. Can I claim 80C under the new regime?"
+                  placeholder={t('ask.placeholder')}
                   className="flex-1 min-w-0 bg-navy-900/[0.03] border border-navy-900/10 rounded-xl px-4 py-2.5 text-sm text-navy-900 placeholder-navy-900/30 focus:outline-none focus:border-navy-900/30"
-                  aria-label="Your question"
+                  aria-label={t('ask.aria')}
                 />
-                <button type="submit" disabled={busy || !q.trim()} className="btn-primary px-4 disabled:opacity-40" aria-label="Ask">
+                <button type="submit" disabled={busy || !q.trim()} className="btn-primary px-4 disabled:opacity-40" aria-label={t('ask.submit')}>
                   {busy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                 </button>
               </form>
               {(answer || busy) && (
                 <div className="p-4 rounded-xl bg-navy-900/[0.02] border border-navy-900/[0.06] space-y-3">
                   {answer ? <AnswerWithCitations text={answer} citations={citations} streaming={busy} lang={lang} />
-                    : <p className="text-xs text-navy-900/40 flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> Searching official sources…</p>}
+                    : <p className="text-xs text-navy-900/40 flex items-center gap-2"><Loader2 size={12} className="animate-spin" /> {t('ask.searching')}</p>}
                   {!busy && (
                     <div className="flex flex-wrap items-start gap-2">
                       <TrustBadge trust={trust} compact />
@@ -92,7 +92,7 @@ export default function AskBox({ module, context, suggestions = [] }) {
                   <SourceChips citations={citations} compact={busy} />
                 </div>
               )}
-              {error && <p className="text-xs text-red-500">{error}</p>}
+              {error && <p className="text-xs text-red-500">{t(error)}</p>}
             </div>
           </motion.div>
         )}

@@ -3,9 +3,11 @@ import { createPortal } from 'react-dom'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ArrowRight, Zap, FileCheck, HeartPulse, X } from 'lucide-react'
 import PrivacyPolicy from './PrivacyPolicy'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function FooterCTA() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false)
+  const { t } = useLanguage()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
@@ -47,14 +49,13 @@ export default function FooterCTA() {
 
 
           <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight mb-5 text-white">
-            Your Financial Independence
+            {t('footer.title1')}
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white/80 via-white to-white/60">Starts Today.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white/80 via-white to-white/60">{t('footer.title2')}</span>
           </h2>
 
           <p className="text-white/50 max-w-lg mx-auto text-lg leading-relaxed mb-10">
-            Calculated by an engine you can inspect, grounded in SEBI, RBI and
-            Income Tax sources, explained privately on your own laptop.
+            {t('footer.sub')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -68,12 +69,12 @@ export default function FooterCTA() {
               }}
               className="px-8 py-4 rounded-xl bg-white text-navy-900 font-semibold text-base flex items-center gap-2 shadow-xl hover:bg-white/90 active:scale-95 transition-all"
             >
-              Get My Free FIRE Plan <ArrowRight size={18} />
+              {t('footer.cta')} <ArrowRight size={18} />
             </button>
           </div>
 
           <p className="mt-6 text-xs text-white/30">
-            No account. No cloud AI. Your numbers never leave this laptop.
+            {t('footer.note')}
           </p>
         </motion.div>
 
@@ -91,36 +92,28 @@ export default function FooterCTA() {
             <span className="font-bold text-sm text-navy-900">
               Fin<span className="text-navy-600/70">Mind</span>
             </span>
-            <span className="text-navy-900/25 text-xs ml-2">runs on your device</span>
+            <span className="text-navy-900/25 text-xs ml-2">{t('footer.tagline')}</span>
           </div>
 
           <div className="flex flex-wrap gap-6 justify-center">
-            {['Privacy Policy'].map(link => (
-              <a
-                key={link}
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (link === 'Privacy Policy') {
-                    setIsPrivacyOpen(true)
-                  }
-                }}
-                className="text-xs text-navy-900/35 hover:text-navy-900/60 transition-colors cursor-pointer"
-              >
-                {link}
-              </a>
-            ))}
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                setIsPrivacyOpen(true)
+              }}
+              className="text-xs text-navy-900/35 hover:text-navy-900/60 transition-colors cursor-pointer"
+            >
+              {t('footer.privacy')}
+            </a>
           </div>
 
-          <p className="text-xs text-navy-900/30">© 2026 FinMind</p>
+          <p className="text-xs text-navy-900/30">{t('footer.rights')}</p>
         </motion.div>
 
         {/* Disclaimer */}
         <p className="mt-6 text-center text-[11px] text-navy-900/25 leading-relaxed max-w-3xl mx-auto">
-          Disclaimer: FinMind provides educational guidance generated on this device and is not investment, tax or
-          legal advice. Numbers come from a deterministic calculator and rules come from official sources, but all
-          investments are subject to market risk. Consult a SEBI-registered investment adviser or a Chartered Accountant
-          before acting.
+          {t('footer.disclaimer')}
         </p>
       </div>
 
@@ -146,7 +139,7 @@ export default function FooterCTA() {
                 <button
                   onClick={() => setIsPrivacyOpen(false)}
                   className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2.5 rounded-full text-navy-900/50 hover:text-navy-900 hover:bg-navy-900/10 transition-all z-20"
-                  aria-label="Close Privacy Policy"
+                  aria-label={t('footer.closePrivacy')}
                 >
                   <X size={22} />
                 </button>

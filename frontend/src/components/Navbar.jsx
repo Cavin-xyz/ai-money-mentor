@@ -113,7 +113,7 @@ export default function Navbar() {
           <button
             className="xl:hidden p-2 rounded-lg text-navy-900/70 hover:text-navy-900 hover:bg-navy-900/[0.05] transition-colors"
             onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={t(menuOpen ? 'nav.closeMenu' : 'nav.openMenu')}
             aria-expanded={menuOpen}
           >
             {menuOpen ? <X size={20} /> : <Menu size={20} />}

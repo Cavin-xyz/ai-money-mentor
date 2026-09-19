@@ -39,7 +39,7 @@ export default function ProfileBanner() {
         <div className="flex items-center gap-2">
           <button onClick={() => openDrawer('profile')} className="btn-primary !py-2 text-xs">{t('banner.create')}</button>
           <button onClick={dismiss} className="btn-ghost !py-2 text-xs">{t('banner.later')}</button>
-          <button onClick={dismiss} className="p-1.5 text-navy-900/35 hover:text-navy-900 sm:hidden" aria-label="Dismiss"><X size={14} /></button>
+          <button onClick={dismiss} className="p-1.5 text-navy-900/35 hover:text-navy-900 sm:hidden" aria-label={t('banner.dismiss')}><X size={14} /></button>
         </div>
       </div>
     </div>

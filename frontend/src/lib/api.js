@@ -49,6 +49,20 @@ function headers(extra = {}) {
   return h
 }
 
+// Fixed server messages mapped to i18n keys, so they follow the chosen language too.
+const SERVER_ERRORS = {
+  'The local AI model is starting up or not running. Try again in a few seconds.': 'err.modelStarting',
+  'Something went wrong while preparing your guidance. Please try again.': 'err.generic',
+  'Something went wrong. Please try again.': 'err.generic',
+  'Paste a message, or enter a UPI ID or app name': 'scam.errEmpty',
+  'Monthly income and expenses are required': 'err.incomeRequired',
+  'Please enter salary for both partners': 'couples.errSalary',
+}
+
+function errorKey(message) {
+  return SERVER_ERRORS[message] || message
+}
+
 async function handle(response) {
   let data = null
   try {
@@ -57,14 +71,15 @@ async function handle(response) {
     /* non-JSON body */
   }
   if (!response.ok || (data && data.error)) {
-    throw new Error((data && data.error) || friendlyStatus(response.status))
+    throw new Error(errorKey(data && data.error) || friendlyStatus(response.status))
   }
   return data
 }
 
+// Friendly errors are i18n keys; components show them with t(), which passes server messages through unchanged.
 function friendlyStatus(status) {
-  if (status === 503) return 'The local AI model is starting up. Try again in a few seconds.'
-  if (status === 0 || status === 502 || status === 504) return 'Cannot reach the local backend. Is it running?'
+  if (status === 503) return 'err.modelStarting'
+  if (status === 0 || status === 502 || status === 504) return 'err.backend'
   return `Request failed (HTTP ${status})`
 }
 
@@ -72,7 +87,7 @@ async function request(path, init) {
   try {
     return await handle(await fetch(`${API_URL}${path}`, init))
   } catch (err) {
-    if (err instanceof TypeError) throw new Error('Cannot reach the local backend. Is it running on port 8080?')
+    if (err instanceof TypeError) throw new Error('err.backend')
     throw err
   }
 }
@@ -122,7 +137,7 @@ export async function streamSse(path, body, handlers = {}, { signal } = {}) {
     })
   } catch (err) {
     if (err.name === 'AbortError') return
-    throw new Error('Cannot reach the local backend. Is it running on port 8080?')
+    throw new Error('err.backend')
   }
   if (!response.ok) {
     await handle(response) // throws with the server's message
@@ -160,6 +175,7 @@ function dispatch(block, handlers) {
   } catch {
     /* plain text payload */
   }
+  if (event === 'error' && data && typeof data.message === 'string') data = { ...data, message: errorKey(data.message) }
   const fn = handlers[event]
   if (fn) fn(data)
 }

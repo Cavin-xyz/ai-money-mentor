@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen, ExternalLink, X } from 'lucide-react'
 import { sectionLabel } from '../../lib/format'
+import { useLanguage } from '../../context/LanguageContext'
 
 const AUTHORITY_STYLE = {
   'Income Tax Department': 'bg-amber-50 text-amber-800 border-amber-200',
@@ -12,6 +13,7 @@ const AUTHORITY_STYLE = {
 
 /** Citation chips; each opens the retrieved passage and a link to the official page. */
 export default function SourceChips({ citations = [], compact = false }) {
+  const { t, p } = useLanguage()
   const [openId, setOpenId] = useState(null)
   const ref = useRef(null)
 
@@ -30,7 +32,7 @@ export default function SourceChips({ citations = [], compact = false }) {
   if (!citations.length) {
     return compact ? null : (
       <p className="text-[11px] text-navy-900/40 flex items-center gap-1.5">
-        <BookOpen size={12} /> No matching passages in the official documents on this device.
+        <BookOpen size={12} /> {t('sources.none')}
       </p>
     )
   }
@@ -39,7 +41,7 @@ export default function SourceChips({ citations = [], compact = false }) {
   return (
     <div ref={ref} className="relative">
       <div className="flex flex-wrap items-center gap-1.5">
-        {!compact && <span className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40 mr-1">Sources</span>}
+        {!compact && <span className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40 mr-1">{t('sources.label')}</span>}
         {citations.map((c) => (
           <button
             key={c.id}
@@ -48,7 +50,7 @@ export default function SourceChips({ citations = [], compact = false }) {
             className={`inline-flex items-center gap-1.5 max-w-full text-[11px] px-2.5 py-1 rounded-full border transition-shadow hover:shadow-sm ${AUTHORITY_STYLE[c.authority] || 'bg-navy-900/[0.04] text-navy-900/70 border-navy-900/10'}`}
           >
             <span className="font-bold">{c.id}</span>
-            <span className="truncate">{c.authority}{sectionLabel(c) ? ` · ${sectionLabel(c)}` : ''}</span>
+            <span className="truncate">{p(c.authority)}{sectionLabel(c, t) ? ` · ${sectionLabel(c, t)}` : ''}</span>
           </button>
         ))}
       </div>
@@ -63,16 +65,16 @@ export default function SourceChips({ citations = [], compact = false }) {
           >
             <div className="flex items-start justify-between gap-3 mb-2">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40">{open.id} · {open.authority}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40">{open.id} · {p(open.authority)}</p>
                 <p className="text-sm font-bold text-navy-900 leading-snug">{open.title}</p>
-                {sectionLabel(open) && <p className="text-[11px] text-amber-700 font-semibold mt-0.5">{sectionLabel(open)}{open.taxYear && open.taxYear !== 'all' ? ` · TY ${open.taxYear}` : ''}</p>}
+                {sectionLabel(open, t) && <p className="text-[11px] text-amber-700 font-semibold mt-0.5">{sectionLabel(open, t)}{open.taxYear && open.taxYear !== 'all' ? ` · ${t('sources.ty', { year: open.taxYear })}` : ''}</p>}
               </div>
-              <button onClick={() => setOpenId(null)} className="p-1 rounded-lg text-navy-900/40 hover:bg-navy-900/[0.05]" aria-label="Close"><X size={14} /></button>
+              <button onClick={() => setOpenId(null)} className="p-1 rounded-lg text-navy-900/40 hover:bg-navy-900/[0.05]" aria-label={t('common.close')}><X size={14} /></button>
             </div>
             <p className="text-xs text-navy-900/65 leading-relaxed max-h-40 overflow-y-auto whitespace-pre-line">{open.snippet}</p>
             {open.url && (
               <a href={open.url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline">
-                Open official source <ExternalLink size={12} />
+                {t('sources.open')} <ExternalLink size={12} />
               </a>
             )}
           </motion.div>

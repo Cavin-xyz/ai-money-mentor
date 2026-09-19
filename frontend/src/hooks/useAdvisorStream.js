@@ -29,7 +29,7 @@ export function useAdvisorStream(path) {
         error: (d) => setState((p) => ({ ...p, status: 'error', error: d.message })),
       }, { signal: c.signal })
       if (!gotResult) {
-        setState((p) => (p.status === 'error' ? p : { ...p, status: 'error', error: 'The response ended early. Please try again.' }))
+        setState((p) => (p.status === 'error' ? p : { ...p, status: 'error', error: 'err.ended' }))
       }
     } catch (e) {
       if (e.name !== 'AbortError') setState((p) => ({ ...p, status: 'error', error: e.message }))

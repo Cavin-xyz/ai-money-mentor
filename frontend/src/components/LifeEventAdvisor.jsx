@@ -9,24 +9,27 @@ import { useAdvisorStream } from '../hooks/useAdvisorStream'
 import { useProfile } from '../context/ProfileContext'
 import { formatINR } from '../lib/format'
 import PipelineProgress from './trust/PipelineProgress'
+import { useLanguage } from '../context/LanguageContext'
 import ResultFooter from './trust/ResultFooter'
 
+// Labels come from i18n: life.event.<id> and life.amount.<id>
 const LIFE_EVENTS = [
-  { id: 'bonus', label: 'I received a Bonus', icon: Gift, amountLabel: 'Bonus amount (₹)', defaultAmount: '500000' },
-  { id: 'marriage', label: 'Getting Married', icon: Heart, amountLabel: 'Wedding budget (₹)', defaultAmount: '1500000' },
-  { id: 'baby', label: 'New Baby', icon: Baby, amountLabel: 'Your monthly income (₹)', defaultAmount: '150000' },
-  { id: 'inheritance', label: 'Inheritance', icon: Landmark, amountLabel: 'Amount inherited (₹)', defaultAmount: '5000000' },
-  { id: 'job_change', label: 'Job Change', icon: Briefcase, amountLabel: 'New annual CTC (₹)', defaultAmount: '2500000' },
-  { id: 'home', label: 'Home Purchase', icon: Home, amountLabel: 'Property price (₹)', defaultAmount: '8000000' },
+  { id: 'bonus', icon: Gift, defaultAmount: '500000' },
+  { id: 'marriage', icon: Heart, defaultAmount: '1500000' },
+  { id: 'baby', icon: Baby, defaultAmount: '150000' },
+  { id: 'inheritance', icon: Landmark, defaultAmount: '5000000' },
+  { id: 'job_change', icon: Briefcase, defaultAmount: '2500000' },
+  { id: 'home', icon: Home, defaultAmount: '8000000' },
 ]
 
+// [field, label key (life.x.<field>), placeholder]
 const EXTRAS = {
   home: [
-    ['loanRatePct', 'Loan rate (%)', '8.5'],
-    ['tenureYears', 'Tenure (years)', '20'],
-    ['downPaymentPct', 'Down payment (%)', '20'],
+    ['loanRatePct', '8.5'],
+    ['tenureYears', '20'],
+    ['downPaymentPct', '20'],
   ],
-  job_change: [['yearsAtEmployer', 'Years at current employer', '']],
+  job_change: [['yearsAtEmployer', '']],
 }
 
 const PRIORITY_STYLE = {
@@ -39,6 +42,7 @@ const fieldClass = 'w-full bg-navy-900/[0.03] border border-navy-900/10 rounded-
 
 export default function LifeEventAdvisor() {
   const { profile, hasProfile, openDrawer, restoreRequest, refresh } = useProfile()
+  const { t, p } = useLanguage()
   const stream = useAdvisorStream('/api/life-event/stream')
   const [selectedEvent, setSelectedEvent] = useState(LIFE_EVENTS[0])
   const [amount, setAmount] = useState(LIFE_EVENTS[0].defaultAmount)
@@ -70,7 +74,7 @@ export default function LifeEventAdvisor() {
   const analyze = () => {
     const amt = Number(String(amount).replace(/[,\s₹]/g, ''))
     if (!amt) {
-      setError('Please enter an amount')
+      setError('life.errAmount')
       return
     }
     setError(null)
@@ -85,19 +89,18 @@ export default function LifeEventAdvisor() {
   const profileIncome = hasProfile && Number(profile?.monthlyIncome) > 0 ? Number(profile.monthlyIncome) : 0
   const health = advisory?.healthImpact
   const chartData = health ? [
-    { name: 'Before', score: health.before },
-    { name: 'After', score: health.after },
+    { name: t('life.before'), score: health.before },
+    { name: t('life.after'), score: health.after },
   ] : []
 
   return (
     <section id="advisor" className="py-16 relative scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
-          <div className="section-tag mb-4"><Sparkles size={11} /> Life events</div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight">Life Event Financial Advisor</h1>
+          <div className="section-tag mb-4"><Sparkles size={11} /> {t('life.tag')}</div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-navy-900 tracking-tight">{t('life.title')}</h1>
           <p className="text-navy-900/50 text-base mt-2 max-w-2xl">
-            Guidance grounded in RBI, SEBI and Income Tax sources. The engine works out tax, EMIs and your health-score impact;
-            the local AI turns it into a plan.
+            {t('life.sub')}
           </p>
         </div>
 
@@ -106,9 +109,9 @@ export default function LifeEventAdvisor() {
             {/* Inputs */}
             <div className="lg:col-span-2 glass-card p-5">
               <h2 className="flex items-center gap-2 text-sm font-bold text-navy-900 mb-4">
-                <Sparkles size={14} className="text-navy-900/40" /> Select a milestone
+                <Sparkles size={14} className="text-navy-900/40" /> {t('life.select')}
               </h2>
-              <div className="space-y-2" role="radiogroup" aria-label="Life event">
+              <div className="space-y-2" role="radiogroup" aria-label={t('life.selectAria')}>
                 {LIFE_EVENTS.map((event) => {
                   const Icon = event.icon
                   const isSelected = selectedEvent.id === event.id
@@ -123,7 +126,7 @@ export default function LifeEventAdvisor() {
                         : 'border-navy-900/[0.08] bg-white text-navy-900/70 hover:border-navy-900/20 hover:bg-navy-900/[0.02]'}`}
                     >
                       <Icon size={16} className={isSelected ? 'text-white/80' : 'text-navy-900/40'} />
-                      {event.label}
+                      {t(`life.event.${event.id}`)}
                       {isSelected && <Check size={14} className="ml-auto text-white/80" />}
                     </button>
                   )
@@ -132,7 +135,7 @@ export default function LifeEventAdvisor() {
 
               <div className="mt-4 pt-4 border-t border-navy-900/[0.06] space-y-3">
                 <label className="block">
-                  <span className="text-xs font-semibold text-navy-900/45 uppercase tracking-wider">{selectedEvent.amountLabel}</span>
+                  <span className="text-xs font-semibold text-navy-900/45 uppercase tracking-wider">{t(`life.amount.${selectedEvent.id}`)}</span>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -144,24 +147,24 @@ export default function LifeEventAdvisor() {
 
                 {selectedEvent.id !== 'baby' && (profileIncome && !monthlyIncome ? (
                   <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-navy-900/[0.03] border border-navy-900/[0.08] text-xs">
-                    <span className="flex items-center gap-1.5 text-navy-900/65"><UserRound size={12} /> Using your profile: {formatINR(profileIncome)}/mo</span>
-                    <button onClick={() => setMonthlyIncome(String(profileIncome))} className="font-semibold text-navy-900/60 hover:text-navy-900">Edit</button>
+                    <span className="flex items-center gap-1.5 text-navy-900/65"><UserRound size={12} /> {t('life.profileIncome', { amount: formatINR(profileIncome) })}</span>
+                    <button onClick={() => setMonthlyIncome(String(profileIncome))} className="font-semibold text-navy-900/60 hover:text-navy-900">{t('common.edit')}</button>
                   </div>
                 ) : (
                   <label className="block">
-                    <span className="text-[11px] font-semibold text-navy-900/45">Your monthly income (₹) — needed for tax and affordability</span>
-                    <input value={monthlyIncome} onChange={(e) => setMonthlyIncome(e.target.value)} inputMode="numeric" placeholder="e.g. 150000" className={`${fieldClass} mt-1`} />
+                    <span className="text-[11px] font-semibold text-navy-900/45">{t('life.incomeLabel')}</span>
+                    <input value={monthlyIncome} onChange={(e) => setMonthlyIncome(e.target.value)} inputMode="numeric" placeholder={t('common.eg', { v: 150000 })} className={`${fieldClass} mt-1`} />
                     {!hasProfile && (
-                      <button onClick={() => openDrawer('profile')} className="mt-1 text-[11px] text-blue-600 hover:underline">Save a profile to skip this next time</button>
+                      <button onClick={() => openDrawer('profile')} className="mt-1 text-[11px] text-blue-600 hover:underline">{t('life.saveProfileHint')}</button>
                     )}
                   </label>
                 ))}
 
                 {EXTRAS[selectedEvent.id] && (
                   <div className="grid grid-cols-2 gap-2">
-                    {EXTRAS[selectedEvent.id].map(([k, label, ph]) => (
+                    {EXTRAS[selectedEvent.id].map(([k, ph]) => (
                       <label key={k} className="block">
-                        <span className="text-[11px] font-semibold text-navy-900/45">{label}</span>
+                        <span className="text-[11px] font-semibold text-navy-900/45">{t(`life.x.${k}`)}</span>
                         <input value={extras[k] ?? ''} placeholder={ph} onChange={(e) => setExtras((x) => ({ ...x, [k]: e.target.value }))} inputMode="decimal" className={`${fieldClass} mt-1`} />
                       </label>
                     ))}
@@ -170,9 +173,9 @@ export default function LifeEventAdvisor() {
               </div>
 
               <button onClick={analyze} disabled={stream.running} className="btn-primary w-full mt-4 flex items-center justify-center gap-2 text-sm disabled:opacity-60">
-                <Sparkles size={14} /> {stream.running ? 'Working…' : 'Build my plan'}
+                <Sparkles size={14} /> {stream.running ? t('common.working') : t('life.build')}
               </button>
-              {error && <p className="mt-2 text-xs text-amber-600 text-center">{error}</p>}
+              {error && <p className="mt-2 text-xs text-amber-600 text-center">{t(error)}</p>}
             </div>
 
             {/* Results */}
@@ -182,9 +185,9 @@ export default function LifeEventAdvisor() {
                   <div className="w-16 h-16 rounded-2xl bg-navy-900/[0.05] border border-navy-900/10 flex items-center justify-center mb-5">
                     <Sparkles size={28} className="text-navy-900/25" />
                   </div>
-                  <h3 className="text-lg font-bold text-navy-900/60 mb-2">Pick a life event</h3>
+                  <h3 className="text-lg font-bold text-navy-900/60 mb-2">{t('life.empty.title')}</h3>
                   <p className="text-sm text-navy-900/35 max-w-sm leading-relaxed">
-                    Choose a milestone and amount. Tax, EMIs and the impact on your health score are calculated on this laptop, then explained.
+                    {t('life.empty.body')}
                   </p>
                 </div>
               )}
@@ -192,16 +195,16 @@ export default function LifeEventAdvisor() {
               {stream.status !== 'idle' && (
                 <PipelineProgress stages={stream.stages} status={stream.status} citations={stream.citations} trust={stream.result?.meta?.trust} />
               )}
-              {stream.status === 'error' && <div className="glass-card p-5 text-sm text-red-600 text-center">{stream.error}</div>}
+              {stream.status === 'error' && <div className="glass-card p-5 text-sm text-red-600 text-center">{t(stream.error)}</div>}
 
               <AnimatePresence>
                 {advisory && (
                   <motion.div key="result" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
                     <div className="glass-card p-6">
-                      <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1.5">Your plan</p>
-                      <h2 className={`text-2xl font-extrabold text-navy-900 leading-snug ${pending ? 'opacity-60' : ''}`}>{advisory.headline}</h2>
+                      <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1.5">{t('life.plan')}</p>
+                      <h2 className={`text-2xl font-extrabold text-navy-900 leading-snug ${pending ? 'opacity-60' : ''}`}>{p(advisory.headline)}</h2>
                       {!advisory.profileUsed && (
-                        <p className="mt-2 text-[11px] text-navy-900/45">Using typical assumptions for expenses and savings — save a profile for exact numbers.</p>
+                        <p className="mt-2 text-[11px] text-navy-900/45">{t('life.assumed')}</p>
                       )}
                     </div>
 
@@ -211,30 +214,30 @@ export default function LifeEventAdvisor() {
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center"><Receipt size={15} className="text-amber-600" /></div>
                           <div>
-                            <p className="text-sm font-bold text-navy-900">Tax & one-time costs</p>
-                            <span className={`inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full border ${PRIORITY_STYLE[advisory.taxImpact?.priority] || PRIORITY_STYLE.MEDIUM}`}>{advisory.taxImpact?.priority} priority</span>
+                            <p className="text-sm font-bold text-navy-900">{t('life.taxTitle')}</p>
+                            <span className={`inline-block mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full border ${PRIORITY_STYLE[advisory.taxImpact?.priority] || PRIORITY_STYLE.MEDIUM}`}>{t('life.priority', { p: p(advisory.taxImpact?.priority) })}</span>
                           </div>
                         </div>
                         <p className="text-xl font-extrabold text-navy-900 font-mono">{advisory.taxImpact?.estimatedLiability}</p>
                       </div>
-                      <p className={`mt-3 text-xs text-navy-900/60 leading-relaxed ${pending ? 'animate-pulse' : ''}`}>{advisory.taxImpact?.description}</p>
+                      <p className={`mt-3 text-xs text-navy-900/60 leading-relaxed ${pending ? 'animate-pulse' : ''}`}>{p(advisory.taxImpact?.description)}</p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-5">
                       {[
-                        ['Immediate actions', ChevronRight, advisory.immediateActions],
-                        ['Long-term allocation', TrendingUp, advisory.longTermAllocation],
+                        ['life.immediate', ChevronRight, advisory.immediateActions],
+                        ['life.longTerm', TrendingUp, advisory.longTermAllocation],
                       ].map(([title, Icon, items]) => (
                         <div key={title} className="glass-card p-5">
-                          <h3 className="flex items-center gap-2 text-sm font-bold text-navy-900 mb-4"><Icon size={14} className="text-navy-900/40" /> {title}</h3>
+                          <h3 className="flex items-center gap-2 text-sm font-bold text-navy-900 mb-4"><Icon size={14} className="text-navy-900/40" /> {t(title)}</h3>
                           <div className="space-y-3">
                             {items?.map((a) => (
                               <div key={a.title} className="p-3.5 rounded-xl bg-navy-900/[0.02] border border-navy-900/[0.06]">
                                 <div className="flex items-start justify-between gap-2 mb-1">
-                                  <p className="text-sm font-semibold text-navy-900">{a.title}</p>
+                                  <p className="text-sm font-semibold text-navy-900">{p(a.title)}</p>
                                   <span className="text-sm font-bold text-navy-900 flex-shrink-0 font-mono">{a.amount}</span>
                                 </div>
-                                <p className={`text-xs text-navy-900/45 leading-relaxed ${pending ? 'animate-pulse' : ''}`}>{a.description}</p>
+                                <p className={`text-xs text-navy-900/45 leading-relaxed ${pending ? 'animate-pulse' : ''}`}>{p(a.description)}</p>
                               </div>
                             ))}
                           </div>
@@ -245,8 +248,8 @@ export default function LifeEventAdvisor() {
                     <div className="grid md:grid-cols-2 gap-5">
                       {/* Health before/after */}
                       <div className="glass-card p-5">
-                        <h3 className="flex items-center gap-2 text-sm font-bold text-navy-900 mb-1"><Activity size={14} className="text-navy-900/40" /> Health score: before vs after</h3>
-                        <p className="text-[11px] text-navy-900/45 mb-3">Same six-dimension engine, before and after this event's cash-flow changes</p>
+                        <h3 className="flex items-center gap-2 text-sm font-bold text-navy-900 mb-1"><Activity size={14} className="text-navy-900/40" /> {t('life.healthTitle')}</h3>
+                        <p className="text-[11px] text-navy-900/45 mb-3">{t('life.healthSub')}</p>
                         <div className="h-40">
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData} margin={{ top: 18, right: 8, left: -24, bottom: 0 }}>
@@ -261,20 +264,20 @@ export default function LifeEventAdvisor() {
                         </div>
                         {health && (
                           <p className={`text-center text-xs font-bold ${health.points >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                            {health.points >= 0 ? '+' : ''}{health.points} points
+                            {t('life.points', { n: `${health.points >= 0 ? '+' : ''}${health.points}` })}
                           </p>
                         )}
                       </div>
 
                       {/* Checklist */}
                       <div className="glass-card p-5">
-                        <h3 className="text-sm font-bold text-navy-900 mb-3">Checklist</h3>
+                        <h3 className="text-sm font-bold text-navy-900 mb-3">{t('life.checklist')}</h3>
                         <ul className="space-y-2">
                           {advisory.checklist?.map((item, i) => (
                             <li key={item}>
                               <button onClick={() => setChecked((c) => ({ ...c, [i]: !c[i] }))} className="w-full flex items-start gap-2.5 text-left text-xs text-navy-900/70 hover:text-navy-900" aria-pressed={!!checked[i]}>
                                 {checked[i] ? <Check size={15} className="text-emerald-600 flex-shrink-0 mt-px" /> : <Square size={15} className="text-navy-900/30 flex-shrink-0 mt-px" />}
-                                <span className={checked[i] ? 'line-through text-navy-900/40' : ''}>{item}</span>
+                                <span className={checked[i] ? 'line-through text-navy-900/40' : ''}>{p(item)}</span>
                               </button>
                             </li>
                           ))}
@@ -283,8 +286,8 @@ export default function LifeEventAdvisor() {
                           <div className="mt-4 p-3 rounded-xl bg-navy-900/[0.04] border border-navy-900/10 flex items-start gap-2.5">
                             <Flame size={14} className="text-navy-900/50 mt-0.5 flex-shrink-0" />
                             <div>
-                              <p className="text-[10px] font-bold text-navy-900/50 uppercase tracking-wider mb-0.5">FIRE impact</p>
-                              <p className="text-xs text-navy-900/65 leading-relaxed">{advisory.fireImpact}</p>
+                              <p className="text-[10px] font-bold text-navy-900/50 uppercase tracking-wider mb-0.5">{t('life.fireImpact')}</p>
+                              <p className="text-xs text-navy-900/65 leading-relaxed">{p(advisory.fireImpact)}</p>
                             </div>
                           </div>
                         )}
@@ -298,8 +301,8 @@ export default function LifeEventAdvisor() {
                       module="life-event"
                       askContext={`${advisory.headline}; tax/costs ${advisory.taxImpact?.estimatedLiability}; health ${health?.before}→${health?.after}`}
                       suggestions={selectedEvent.id === 'home'
-                        ? ['Can I claim home-loan interest in the new regime?', 'How much down payment does RBI require?']
-                        : ['Is this taxed at my slab rate?', 'Where should I park money short term?']}
+                        ? [t('life.ask.home1'), t('life.ask.home2')]
+                        : [t('life.ask.other1'), t('life.ask.other2')]}
                     />
                   </motion.div>
                 )}

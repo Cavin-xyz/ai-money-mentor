@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { UserRound, Calculator, BookOpen, Cpu, ShieldCheck, Check, Loader2, ChevronDown, FileSearch } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 
 const BASE_STEPS = [
-  { key: 'memory', label: 'Reading your profile', icon: UserRound },
-  { key: 'calc', label: 'Calculating (Java engine)', icon: Calculator },
-  { key: 'retrieve', label: 'Searching SEBI · RBI · Income Tax sources', icon: BookOpen },
-  { key: 'llm', label: 'Writing explanation (local model)', icon: Cpu },
-  { key: 'safety', label: 'Safety checks', icon: ShieldCheck },
+  { key: 'memory', icon: UserRound },
+  { key: 'calc', icon: Calculator },
+  { key: 'retrieve', icon: BookOpen },
+  { key: 'llm', icon: Cpu },
+  { key: 'safety', icon: ShieldCheck },
 ]
 
-const PARSE_STEP = { key: 'parse', label: 'Parsing statement · matching AMFI schemes', icon: FileSearch }
+const PARSE_STEP = { key: 'parse', icon: FileSearch }
 
 function fmtMs(ms) {
   if (ms === undefined || ms === null) return ''
@@ -22,6 +23,7 @@ function fmtMs(ms) {
  * Collapses to a one-line summary once the result is in.
  */
 export default function PipelineProgress({ stages = {}, status, withParse = false, citations = [], trust }) {
+  const { t, p } = useLanguage()
   const [expanded, setExpanded] = useState(false)
   const steps = withParse ? [PARSE_STEP, ...BASE_STEPS] : BASE_STEPS
   const done = status === 'done'
@@ -42,10 +44,10 @@ export default function PipelineProgress({ stages = {}, status, withParse = fals
       >
         <span className="flex items-center gap-2 text-xs font-semibold text-emerald-800">
           <Check size={14} className="text-emerald-600" />
-          Done in {fmtMs(totalMs)} · {citations.length} source{citations.length === 1 ? '' : 's'}
-          {total ? ` · ${passed}/${total} checks passed` : ''}
+          {t('pipeline.doneIn', { time: fmtMs(totalMs) })} · {t('pipeline.sources', { n: citations.length })}
+          {total ? ` · ${t('pipeline.checks', { p: passed, t: total })}` : ''}
         </span>
-        <span className="flex items-center gap-1 text-[11px] text-emerald-700/70">How it ran <ChevronDown size={12} /></span>
+        <span className="flex items-center gap-1 text-[11px] text-emerald-700/70">{t('pipeline.how')} <ChevronDown size={12} /></span>
       </button>
     )
   }
@@ -53,9 +55,9 @@ export default function PipelineProgress({ stages = {}, status, withParse = fals
   return (
     <div className="glass-card p-4 sm:p-5" aria-live="polite">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40">Running on this laptop</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-navy-900/40">{t('pipeline.running')}</p>
         {done && (
-          <button onClick={() => setExpanded(false)} className="text-[11px] text-navy-900/40 hover:text-navy-900">Hide</button>
+          <button onClick={() => setExpanded(false)} className="text-[11px] text-navy-900/40 hover:text-navy-900">{t('pipeline.hide')}</button>
         )}
       </div>
       <ol className="space-y-2">
@@ -79,11 +81,11 @@ export default function PipelineProgress({ stages = {}, status, withParse = fals
                 {st === 'done' ? <Check size={13} /> : st === 'start' || st === 'retry' ? <Loader2 size={13} className="animate-spin" /> : <Icon size={13} />}
               </span>
               <span className={`flex-1 min-w-0 text-sm ${st === 'pending' ? 'text-navy-900/35' : 'text-navy-900 font-medium'}`}>
-                {s.label}
+                {t(`stage.${s.key}`)}
                 <AnimatePresence>
                   {info?.detail && (
                     <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`block text-[11px] truncate ${st === 'retry' ? 'text-amber-600' : 'text-navy-900/45'}`}>
-                      {info.detail}
+                      {p(info.detail)}
                     </motion.span>
                   )}
                 </AnimatePresence>

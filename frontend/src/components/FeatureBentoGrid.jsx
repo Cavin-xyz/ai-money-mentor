@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { ScanLine, Calculator, Users, LayoutGrid, ArrowRight, Flame, Lightbulb, Activity, ShieldAlert } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
 
 const scrollTo = (href) => {
   const el = document.getElementById(href.slice(1))
@@ -11,41 +12,18 @@ const scrollTo = (href) => {
   }
 }
 
+// Copy lives in i18n: features.<id>.tag / .title / .desc
 const features = [
-  {
-    icon: ScanLine,
-    iconColor: 'text-blue-600',
-    iconBg: 'bg-blue-50 border-blue-200',
-    tag: 'Portfolio X-Ray',
-    title: 'Instant Portfolio Audit',
-    desc: 'Upload your CAMS/KFintech statement — parsed on your laptop, matched to AMFI data. See overlap, real XIRR and what Regular plans cost you.',
-    href: '#xray',
-  },
-  {
-    icon: Calculator,
-    iconColor: 'text-amber-600',
-    iconBg: 'bg-amber-50 border-amber-200',
-    tag: 'Tax Wizard',
-    title: 'Old vs. New Regime',
-    desc: 'Old vs New regime calculated to the rupee for Tax Year 2026-27, with answers cited from Income Tax Department sources.',
-    href: '#tax',
-  },
-  {
-    icon: Users,
-    iconColor: 'text-purple-600',
-    iconBg: 'bg-purple-50 border-purple-200',
-    tag: "Couple's Planner",
-    title: 'Optimize Together',
-    desc: 'Both partners run through the tax engine; every suggested move is priced by recomputing the tax, plus fair ways to split costs.',
-    href: '#couples',
-  },
+  { id: 'xray', icon: ScanLine, iconColor: 'text-blue-600', iconBg: 'bg-blue-50 border-blue-200', href: '#xray' },
+  { id: 'tax', icon: Calculator, iconColor: 'text-amber-600', iconBg: 'bg-amber-50 border-amber-200', href: '#tax' },
+  { id: 'couples', icon: Users, iconColor: 'text-purple-600', iconBg: 'bg-purple-50 border-purple-200', href: '#couples' },
 ]
 
 const miniFeatures = [
-  { icon: Flame, title: 'FIRE Path Planner', desc: 'Required SIP, glide path and 1,000 market scenarios, with instant what-ifs.', href: '#fire' },
-  { icon: Lightbulb, title: 'Life Event Advisor', desc: 'Bonus, baby, home or new job: tax, EMIs and health-score impact.', href: '#advisor' },
-  { icon: Activity, title: 'Money Health Score', desc: 'Six dimensions scored by visible formulas, not AI guesses.', href: '#health' },
-  { icon: ShieldAlert, title: 'Scam Shield', desc: 'Check a message, UPI ID or loan app against SEBI and RBI rules.', href: '#scam' },
+  { id: 'fire', icon: Flame, href: '#fire' },
+  { id: 'life', icon: Lightbulb, href: '#advisor' },
+  { id: 'health', icon: Activity, href: '#health' },
+  { id: 'scam', icon: ShieldAlert, href: '#scam' },
 ]
 
 const cardVariants = {
@@ -60,6 +38,7 @@ const cardVariants = {
 export default function FeatureBentoGrid() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
+  const { t } = useLanguage()
 
   return (
     <section id="features" className="py-24 relative">
@@ -73,13 +52,13 @@ export default function FeatureBentoGrid() {
         >
           <div className="section-tag mx-auto mb-4">
             <LayoutGrid size={11} />
-            Core Features
+            {t('features.tag')}
           </div>
           <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-navy-900">
-            Everything You Need to <span className="gradient-text">Grow Wealth</span>
+            {t('features.title')} <span className="gradient-text">{t('features.titleAccent')}</span>
           </h2>
           <p className="mt-4 text-navy-900/50 max-w-lg mx-auto">
-            Seven tools. Each one calculates with a deterministic engine, cites official sources and explains with an AI that never leaves your laptop.
+            {t('features.sub')}
           </p>
         </motion.div>
 
@@ -87,7 +66,7 @@ export default function FeatureBentoGrid() {
         <div className="grid md:grid-cols-3 gap-5">
           {features.map((f, i) => (
             <motion.div
-              key={f.tag}
+              key={f.id}
               custom={i}
               variants={cardVariants}
               initial="hidden"
@@ -100,13 +79,13 @@ export default function FeatureBentoGrid() {
                   <f.icon size={17} className={f.iconColor} />
                 </div>
                 <div>
-                  <p className={`text-xs font-semibold ${f.iconColor} uppercase tracking-wider`}>{f.tag}</p>
-                  <h3 className="text-base font-bold text-navy-900">{f.title}</h3>
+                  <p className={`text-xs font-semibold ${f.iconColor} uppercase tracking-wider`}>{t(`features.${f.id}.tag`)}</p>
+                  <h3 className="text-base font-bold text-navy-900">{t(`features.${f.id}.title`)}</h3>
                 </div>
               </div>
-              <p className="text-sm text-navy-900/50 leading-relaxed">{f.desc}</p>
+              <p className="text-sm text-navy-900/50 leading-relaxed">{t(`features.${f.id}.desc`)}</p>
               <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-navy-900/40 group-hover:text-navy-900 transition-colors">
-                Explore feature <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                {t('features.explore')} <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </motion.div>
           ))}
@@ -116,7 +95,7 @@ export default function FeatureBentoGrid() {
         <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {miniFeatures.map((f, i) => (
             <motion.div
-              key={f.title}
+              key={f.id}
               custom={i + 3}
               variants={cardVariants}
               initial="hidden"
@@ -128,8 +107,8 @@ export default function FeatureBentoGrid() {
                 <f.icon size={18} className="text-navy-900/50" />
               </div>
               <div>
-                <p className="text-sm font-bold text-navy-900">{f.title}</p>
-                <p className="text-xs text-navy-900/45 mt-1 leading-relaxed">{f.desc}</p>
+                <p className="text-sm font-bold text-navy-900">{t(`features.${f.id}.title`)}</p>
+                <p className="text-xs text-navy-900/45 mt-1 leading-relaxed">{t(`features.${f.id}.desc`)}</p>
               </div>
             </motion.div>
           ))}

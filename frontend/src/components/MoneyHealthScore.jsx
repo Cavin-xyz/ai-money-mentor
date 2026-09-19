@@ -7,6 +7,7 @@ import { Activity, Sparkles, ChevronRight, ChevronLeft, UserRound, Info } from '
 import { useAdvisorStream } from '../hooks/useAdvisorStream'
 import { useProfile, profileValues } from '../context/ProfileContext'
 import PipelineProgress from './trust/PipelineProgress'
+import { useLanguage } from '../context/LanguageContext'
 import ResultFooter from './trust/ResultFooter'
 
 const PROFILE_MAP = {
@@ -50,6 +51,7 @@ export default function MoneyHealthScore() {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   const { profile, hasProfile, restoreRequest, refresh } = useProfile()
+  const { t, p } = useLanguage()
   const stream = useAdvisorStream('/api/health-score/stream')
   const [formPage, setFormPage] = useState(0)
   const [openFormula, setOpenFormula] = useState(null)
@@ -96,106 +98,74 @@ export default function MoneyHealthScore() {
       onClick={() => handleChange(field, opt)}
       className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${currentValue === opt ? 'border-navy-900 bg-navy-900/[0.06] text-navy-900 font-semibold' : 'border-navy-900/10 bg-navy-900/[0.02] text-navy-900/50 hover:bg-navy-900/[0.04]'}`}
     >
-      {opt}
+      {t(opt === 'Yes' ? 'common.yes' : 'common.no')}
     </button>
+  )
+
+  const label = (key) => <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">{t(key)}</label>
+  const numberField = (key, field, placeholder, extra = {}) => (
+    <div>
+      {label(key)}
+      <input type="number" value={formData[field]} onChange={e => handleChange(field, e.target.value)} className={inputClass} placeholder={placeholder ? t('common.eg', { v: placeholder }) : undefined} {...extra} />
+    </div>
+  )
+  const yesNo = (key, field) => (
+    <div>
+      {label(key)}
+      <div className="flex gap-3">{['Yes', 'No'].map(opt => toggleButton(field, opt, formData[field]))}</div>
+    </div>
   )
 
   const formPages = [
     {
-      title: 'Income & Emergency',
+      title: t('health.page.income'),
       fields: (
         <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Monthly Take-Home Income (₹)</label>
-            <input type="number" value={formData.monthlyIncome} onChange={e => handleChange('monthlyIncome', e.target.value)} className={inputClass} placeholder="e.g. 150000" />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Monthly Expenses (₹)</label>
-            <input type="number" value={formData.monthlyExpenses} onChange={e => handleChange('monthlyExpenses', e.target.value)} className={inputClass} placeholder="e.g. 50000" />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Liquid Savings — FDs, Savings A/C, Liquid Funds (₹)</label>
-            <input type="number" value={formData.liquidSavings} onChange={e => handleChange('liquidSavings', e.target.value)} className={inputClass} placeholder="e.g. 300000" />
-          </div>
+          {numberField('health.f.income', 'monthlyIncome', '150000')}
+          {numberField('health.f.expenses', 'monthlyExpenses', '50000')}
+          {numberField('health.f.liquid', 'liquidSavings', '300000')}
         </div>
       ),
     },
     {
-      title: 'Insurance & Debt',
+      title: t('health.page.insurance'),
       fields: (
         <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Financial Dependents?</label>
-            <div className="flex gap-3">{['Yes', 'No'].map(opt => toggleButton('dependents', opt, formData.dependents))}</div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Term Life Insurance Cover (₹)</label>
-            <input type="number" value={formData.lifeCover} onChange={e => handleChange('lifeCover', e.target.value)} className={inputClass} placeholder="e.g. 10000000" />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Health Insurance Cover (₹)</label>
-            <input type="number" value={formData.healthCover} onChange={e => handleChange('healthCover', e.target.value)} className={inputClass} placeholder="e.g. 1000000" />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Total Monthly EMI — All Loans (₹)</label>
-            <input type="number" value={formData.monthlyEmi} onChange={e => handleChange('monthlyEmi', e.target.value)} className={inputClass} placeholder="e.g. 35000" />
-          </div>
+          {yesNo('health.f.dependents', 'dependents')}
+          {numberField('health.f.life', 'lifeCover', '10000000')}
+          {numberField('health.f.health', 'healthCover', '1000000')}
+          {numberField('health.f.emi', 'monthlyEmi', '35000')}
         </div>
       ),
     },
     {
-      title: 'Investments & Tax',
+      title: t('health.page.investments'),
       fields: (
         <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Invest beyond FDs/Savings?</label>
-            <div className="flex gap-3">{['Yes', 'No'].map(opt => toggleButton('investOutsideFd', opt, formData.investOutsideFd))}</div>
-          </div>
+          {yesNo('health.f.investBeyond', 'investOutsideFd')}
           {formData.investOutsideFd === 'Yes' && (
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">% Equity</label>
-                <input type="number" max="100" value={formData.equityPct} onChange={e => handleChange('equityPct', e.target.value)} className={inputClass} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">% Debt</label>
-                <input type="number" max="100" value={formData.debtPct} onChange={e => handleChange('debtPct', e.target.value)} className={inputClass} />
-              </div>
+              {numberField('health.f.equity', 'equityPct', null, { max: '100' })}
+              {numberField('health.f.debt', 'debtPct', null, { max: '100' })}
             </div>
           )}
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Exhausted 80C limit (₹1.5L)?</label>
-            <div className="flex gap-3">{['Yes', 'No'].map(opt => toggleButton('exhausted80C', opt, formData.exhausted80C))}</div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Claim health insurance under 80D?</label>
-            <div className="flex gap-3">{['Yes', 'No'].map(opt => toggleButton('claim80D', opt, formData.claim80D))}</div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Contribute to NPS (80CCD)?</label>
-            <div className="flex gap-3">{['Yes', 'No'].map(opt => toggleButton('useNPS', opt, formData.useNPS))}</div>
-          </div>
+          {yesNo('health.f.80c', 'exhausted80C')}
+          {yesNo('health.f.80d', 'claim80D')}
+          {yesNo('health.f.nps', 'useNPS')}
         </div>
       ),
     },
     {
-      title: 'Retirement',
+      title: t('health.page.retirement'),
       fields: (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Current Age</label>
-              <input type="number" value={formData.currentAge} onChange={e => handleChange('currentAge', e.target.value)} className={inputClass} placeholder="e.g. 30" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Target Retirement Age</label>
-              <input type="number" value={formData.targetRetirementAge} onChange={e => handleChange('targetRetirementAge', e.target.value)} className={inputClass} placeholder="e.g. 50" />
-            </div>
+            {numberField('health.f.age', 'currentAge', '30')}
+            {numberField('health.f.retireAge', 'targetRetirementAge', '50')}
           </div>
           <div>
-            <label className="block text-xs font-semibold text-navy-900/50 uppercase tracking-wider mb-1.5">Retirement Corpus So Far (₹)</label>
-            <input type="number" value={formData.retirementCorpus} onChange={e => handleChange('retirementCorpus', e.target.value)} className={inputClass} placeholder="e.g. 2500000" />
-            <p className="text-[10px] text-navy-900/30 mt-1.5">Include EPF, PPF, NPS, equity MFs mapped to retirement</p>
+            {numberField('health.f.corpus', 'retirementCorpus', '2500000')}
+            <p className="text-[10px] text-navy-900/30 mt-1.5">{t('health.f.corpusHint')}</p>
           </div>
         </div>
       ),
@@ -204,7 +174,7 @@ export default function MoneyHealthScore() {
 
   const handleAnalyze = () => {
     if (!formData.monthlyIncome || !formData.monthlyExpenses) {
-      setError('Please enter at least your monthly income and expenses.')
+      setError('health.errRequired')
       setFormPage(0)
       return
     }
@@ -227,13 +197,13 @@ export default function MoneyHealthScore() {
         >
           <div className="section-tag mx-auto mb-4">
             <Activity size={11} />
-            Money Health Score
+            {t('health.tag')}
           </div>
           <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-navy-900">
-            Your Financial <span className="gradient-text">Vital Signs</span>
+            {t('health.title')} <span className="gradient-text">{t('health.titleAccent')}</span>
           </h2>
           <p className="mt-4 text-navy-900/50 max-w-xl mx-auto text-base leading-relaxed">
-            Six dimensions scored by visible formulas, not AI guesses. Tap any score to see exactly how it was computed.
+            {t('health.sub')}
           </p>
         </motion.div>
 
@@ -250,13 +220,13 @@ export default function MoneyHealthScore() {
               <div className="glass-card p-6 sm:p-8">
                 {hasProfile && (
                   <button onClick={() => setFormData((p) => ({ ...p, ...profileValues(profile, PROFILE_MAP) }))} className="mb-4 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-navy-900/[0.04] border border-navy-900/10 text-xs font-semibold text-navy-900/70 hover:bg-navy-900/[0.07]">
-                    <UserRound size={13} /> Use my saved numbers
+                    <UserRound size={13} /> {t('common.useSaved')}
                   </button>
                 )}
                 {/* Progress */}
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-navy-900/45">
-                    Step {formPage + 1} of {formPages.length}
+                    {t('common.stepOf', { n: formPage + 1, total: formPages.length })}
                   </span>
                   <span className="text-xs font-bold text-navy-900">
                     {formPages[formPage].title}
@@ -290,7 +260,7 @@ export default function MoneyHealthScore() {
                     disabled={formPage === 0}
                     className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-navy-900/10 text-navy-900/50 hover:bg-navy-900/[0.03] transition-colors text-sm disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    <ChevronLeft size={16} /> Back
+                    <ChevronLeft size={16} /> {t('common.back')}
                   </button>
 
                   {formPage < formPages.length - 1 ? (
@@ -298,7 +268,7 @@ export default function MoneyHealthScore() {
                       onClick={() => setFormPage(p => p + 1)}
                       className="btn-primary flex items-center gap-1.5 text-sm"
                     >
-                      Continue <ChevronRight size={16} />
+                      {t('common.continue')} <ChevronRight size={16} />
                     </button>
                   ) : (
                     <button
@@ -306,13 +276,13 @@ export default function MoneyHealthScore() {
                       className="btn-primary flex items-center gap-2 text-sm"
                     >
                       <Sparkles size={14} />
-                      Score my finances
+                      {t('health.score')}
                     </button>
                   )}
                 </div>
 
                 {error && (
-                  <p className="mt-3 text-xs text-red-500 text-center">{error}</p>
+                  <p className="mt-3 text-xs text-red-500 text-center">{t(error)}</p>
                 )}
               </div>
             </motion.div>
@@ -332,8 +302,8 @@ export default function MoneyHealthScore() {
               </div>
               {stream.status === 'error' && (
                 <div className="glass-card p-5 text-center max-w-3xl mx-auto">
-                  <p className="text-sm text-red-600">{stream.error}</p>
-                  <button onClick={() => stream.reset()} className="btn-ghost mt-3 text-xs">Back to the form</button>
+                  <p className="text-sm text-red-600">{t(stream.error)}</p>
+                  <button onClick={() => stream.reset()} className="btn-ghost mt-3 text-xs">{t('common.backToForm')}</button>
                 </div>
               )}
               {results && (<>
@@ -366,23 +336,23 @@ export default function MoneyHealthScore() {
                         <span className="text-xs text-navy-900/40">/100</span>
                       </div>
                     </div>
-                    <p className="text-sm font-semibold text-navy-900">Overall Score</p>
-                    <p className={`text-xs font-semibold mt-0.5 ${LABEL_COLOR[results.overallLabel] || 'text-navy-900/60'}`}>{results.overallLabel}</p>
-                    <p className="text-[10px] text-navy-900/35 mt-1">Weighted: {(results.dimensions || []).map((d) => `${d.dimension} ${d.weight}%`).join(' · ')}</p>
+                    <p className="text-sm font-semibold text-navy-900">{t('health.overall')}</p>
+                    <p className={`text-xs font-semibold mt-0.5 ${LABEL_COLOR[results.overallLabel] || 'text-navy-900/60'}`}>{p(results.overallLabel)}</p>
+                    <p className="text-[10px] text-navy-900/35 mt-1">{t('health.weighted', { list: (results.dimensions || []).map((d) => `${p(d.dimension)} ${d.weight}%`).join(' · ') })}</p>
                   </div>
 
                   <div className="space-y-3">
                     {(results.dimensions || []).map(d => (
                       <div key={d.label} className="space-y-1.5">
                         <button onClick={() => setOpenFormula(openFormula === d.label ? null : d.label)} className="w-full flex justify-between items-center text-left" aria-expanded={openFormula === d.label}>
-                          <span className="text-xs text-navy-900/55 flex items-center gap-1">{d.label} <Info size={11} className="text-navy-900/30" /></span>
+                          <span className="text-xs text-navy-900/55 flex items-center gap-1">{p(d.label)} <Info size={11} className="text-navy-900/30" /></span>
                           <span className="text-xs font-bold" style={{ color: d.color }}>{d.value}</span>
                         </button>
                         <ScoreBar value={d.value} color={d.color} />
                         {openFormula === d.label && (
                           <div className="text-[11px] p-2.5 rounded-lg bg-navy-900/[0.03] border border-navy-900/[0.06] space-y-0.5">
-                            <p className="font-mono text-navy-900/70">{d.formula}</p>
-                            <p className="text-navy-900/50">{d.desc}</p>
+                            <p className="font-mono text-navy-900/70">{p(d.formula)}</p>
+                            <p className="text-navy-900/50">{p(d.desc)}</p>
                           </div>
                         )}
                       </div>
@@ -397,9 +367,9 @@ export default function MoneyHealthScore() {
                   transition={{ duration: 0.5, delay: 0.25 }}
                   className="glass-card p-6 flex flex-col items-center"
                 >
-                  <p className="text-sm font-semibold text-navy-900/70 mb-4 self-start">Dimension Radar</p>
+                  <p className="text-sm font-semibold text-navy-900/70 mb-4 self-start">{t('health.radar')}</p>
                   <ResponsiveContainer width="100%" height={280}>
-                    <RadarChart cx="50%" cy="50%" outerRadius="72%" data={results.dimensions || []}>
+                    <RadarChart cx="50%" cy="50%" outerRadius="72%" data={(results.dimensions || []).map((d) => ({ ...d, dimension: p(d.dimension) }))}>
                       <PolarGrid stroke="rgba(10,25,47,0.08)" />
                       <PolarAngleAxis
                         dataKey="dimension"
@@ -418,8 +388,8 @@ export default function MoneyHealthScore() {
                   </ResponsiveContainer>
 
                   <div className="mt-4 w-full p-3 rounded-xl bg-navy-900/[0.04] border border-navy-900/[0.08] text-center">
-                    <p className="text-xs text-navy-900/45">Biggest opportunity</p>
-                    <p className="text-sm font-bold text-navy-900 mt-0.5">{results.biggestOpportunity || '—'}</p>
+                    <p className="text-xs text-navy-900/45">{t('health.biggest')}</p>
+                    <p className="text-sm font-bold text-navy-900 mt-0.5">{p(results.biggestOpportunity) || '—'}</p>
                   </div>
                 </motion.div>
 
@@ -432,18 +402,18 @@ export default function MoneyHealthScore() {
                 >
                   <div className="flex items-center gap-2">
                     <Sparkles size={14} className="text-navy-900/40" />
-                    <p className="text-sm font-semibold text-navy-900/70">Recommendations</p>
+                    <p className="text-sm font-semibold text-navy-900/70">{t('health.recs')}</p>
                   </div>
 
                   {(results.recommendations || []).map((item, i) => (
                     <div key={i} className="p-3 rounded-xl bg-navy-900/[0.02] border border-navy-900/[0.06] space-y-1.5">
                       <div className="flex items-center gap-2">
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.color}`}>
-                          {item.priority}
+                          {p(item.priority)}
                         </span>
                       </div>
-                      <p className="text-sm font-semibold text-navy-900">{item.title}</p>
-                      <p className={`text-xs text-navy-900/45 leading-relaxed ${pending ? 'animate-pulse' : ''}`}>{item.detail}</p>
+                      <p className="text-sm font-semibold text-navy-900">{p(item.title)}</p>
+                      <p className={`text-xs text-navy-900/45 leading-relaxed ${pending ? 'animate-pulse' : ''}`}>{p(item.detail)}</p>
                     </div>
                   ))}
 
@@ -451,7 +421,7 @@ export default function MoneyHealthScore() {
                     onClick={() => { stream.reset(); setFormPage(0) }}
                     className="btn-primary w-full justify-center text-sm mt-2"
                   >
-                    Re-Analyze My Finances
+                    {t('health.reanalyze')}
                   </button>
                 </motion.div>
               </div>
@@ -462,7 +432,7 @@ export default function MoneyHealthScore() {
                   pending={pending}
                   module="health-score"
                   askContext={`Health score ${results.overall}/100 (${results.overallLabel}); biggest opportunity: ${results.biggestOpportunity}`}
-                  suggestions={['How much term insurance do I need?', 'Is 80D available in the new regime?', 'What counts as an emergency fund?']}
+                  suggestions={[t('health.ask.1'), t('health.ask.2'), t('health.ask.3')]}
                 />
               </div>
               </>)}
