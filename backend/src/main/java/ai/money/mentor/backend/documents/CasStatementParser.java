@@ -32,7 +32,17 @@ public class CasStatementParser {
             @Value("${mentor.cas-script:tools/cas_to_json.py}") String script) {
         this.jsonMapper = jsonMapper;
         this.python = python;
-        this.script = Path.of(script);
+        this.script = resolveScript(script);
+    }
+
+    private static Path resolveScript(String configured) {
+        Path script = Path.of(configured).toAbsolutePath().normalize();
+        if (Files.exists(script)) return script;
+
+        // The demo may start the jar from the repository root, while development
+        // starts Spring Boot from backend/. Support both working directories.
+        Path fromRepositoryRoot = Path.of("backend").resolve(configured).toAbsolutePath().normalize();
+        return Files.exists(fromRepositoryRoot) ? fromRepositoryRoot : script;
     }
 
     public JsonNode parse(byte[] pdf, String password) {
